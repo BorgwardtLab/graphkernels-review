@@ -225,9 +225,19 @@ def load_graphs(directory):
         g = ig.Graph.Adjacency((local_adjacencies > 0).tolist())
 
         if node_labels is not None:
+
+            # Ensures that the dimension/cardinality of the two vectors
+            # makes sense.
+            assert len(node_labels[graph_indices]) == g.vcount()
+
             g.vs['label'] = node_labels[graph_indices]
 
         if edge_labels is not None:
+
+            # Ensures that the dimension/cardinality of the two vectors
+            # makes sense.
+            assert len(edge_labels[graph_indices]) == g.ecount()
+
             g.es['label'] = edge_labels[graph_indices]
 
         # Note that we can use the _regular_ index from the `for` loop
