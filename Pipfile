@@ -12,3 +12,6 @@ tqdm = "*"
 
 [requires]
 python_version = "3.7"
+
+[scripts]
+install_graphkernels_package = "pip install graphkernels"
