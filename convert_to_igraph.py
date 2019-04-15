@@ -205,8 +205,6 @@ def load_graphs(directory):
     else:
         node_attributes = None
 
-    logging.info('Starting graph creation process...')
-
     ####################################################################
     # Edge attributes
     ####################################################################
@@ -218,6 +216,20 @@ def load_graphs(directory):
 
         edge_attributes = np.loadtxt(path, delimiter=',')
         assert edge_attributes.shape[0] == n_edges
+
+        # Make this into a tensor for subsequent index-based access;
+        # this requires only knowledge about the dimension of *each*
+        # attribute.
+
+        M = np.empty((n_vertices, n_vertices, edge_attributes.shape[1]))
+
+        for index in tqdm(range(n_edges), desc='Edge'):
+            source_index = source_indices[index]
+            target_index = target_indices[index]
+
+            M[source_index, target_index, :] = edge_attributes[index]
+
+        edge_attributes = M
 
     else:
         edge_attributes = None
@@ -273,6 +285,11 @@ def load_graphs(directory):
             g.vs['attribute'] = node_attributes[graph_indices]
 
         if edge_attributes is not None:
+
+            # Ensures that the assignment works as expected and does not
+            # miss any edges.
+            assert len(edge_attributes[graph_indices]) == g.ecount()
+
             g.es['attribute'] = edge_attributes[graph_indices]
 
         graphs.append(g)
