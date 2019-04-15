@@ -10,6 +10,7 @@ import sys
 
 import graphkernels.kernels as gk
 import igraph as ig
+import numpy as np
 
 from tqdm import tqdm
 
@@ -49,5 +50,31 @@ is specified.
 
     graphs = [
         ig.read(filename, format='picklez') for filename in
-            tqdm(args.FILE, desc='File')
+        tqdm(args.FILE, desc='File')
     ]
+
+    algorithms = {
+        'EH': gk.CalculateEdgeHistKernel,
+        'GL': gk.CalculateConnectedGraphletKernel,
+        'VH': gk.CalculateVertexHistKernel,
+        'WL': gk.CalculateWLKernel,
+    }
+
+    param_grid = {
+        'WL': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],   # $h$ = number of iterations
+        'GL': [0, 1, 2, 3],                     # $k$ = size of graphlet
+    }
+
+    os.makedirs(args.output, exist_ok=True)
+
+    for algorithm in sorted(tqdm(algorithms.keys(), desc='Algorithm')):
+
+        # FIXME: skipping algorithms with parameters for now
+        if algorithm in param_grid.keys():
+            continue
+
+        f = algorithms[algorithm]
+        K = f(graphs)
+
+        filename = os.path.join(args.output, f'{algorithm}.npz')
+        np.savez(filename, K=K)
