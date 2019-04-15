@@ -12,6 +12,9 @@ import os
 import igraph as ig
 import numpy as np
 
+from tqdm import tqdm
+
+
 def get_data_set_name(directory):
 
     # The basename of any data set can be read off from its directory;
@@ -129,13 +132,19 @@ def load_graphs(directory):
 
     # Create basic graph structure from adjacency matrix. This does
     # *not* yet add any vertices or labels.
-    for index in range(n_graphs):
+    for index in tqdm(range(n_graphs), desc='Creating graph'):
         graph_indices = np.where(I == index)[0]
 
         local_adjacencies = all_adjacencies[graph_indices, :]
         local_adjacencies = local_adjacencies[:, graph_indices]
 
         g = ig.Graph.Adjacency((local_adjacencies > 0).tolist())
+
+        if node_labels is not None:
+            g.vs['label'] = node_labels[graph_indices]
+
+        if edge_labels is not None:
+            g.es['label'] = edge_labels[graph_indices]
 
     # Get graph labels; note that this file *has* to exist because we
     # cannot do any classification otherwise.
