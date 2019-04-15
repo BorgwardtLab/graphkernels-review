@@ -348,7 +348,7 @@ is specified.
 
     logging.info(f'Writing graphs to {args.output}...')
 
-    os.makedirs(directory)
+    os.makedirs(args.output, exist_ok=True)
 
     for index, graph in tqdm(enumerate(graphs), desc='Graph'):
         filename = f'{index:0{n_digits}d}.pickle'
