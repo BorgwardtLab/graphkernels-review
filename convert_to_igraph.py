@@ -286,11 +286,14 @@ def load_graphs(directory):
 
         if edge_attributes is not None:
 
-            # Ensures that the assignment works as expected and does not
-            # miss any edges.
-            assert len(edge_attributes[graph_indices]) == g.ecount()
+            # Look up the proper sub-matrix of the matrix containing
+            # *all* edge attributes.
+            edge_attributes_ = edge_attributes[graph_indices, :]
+            edge_attributes_ = edge_attributes_[:, graph_indices]
 
-            g.es['attribute'] = edge_attributes[graph_indices]
+            g.es['attribute'] = [
+                edge_attributes_[i, j] for i, j in g.get_edgelist()
+            ]
 
         graphs.append(g)
 
