@@ -236,6 +236,11 @@ def load_graphs(directory):
 
     logging.info('Starting graph creation process...')
 
+    # Get graph labels; note that this file *has* to exist because we
+    # cannot do any classification otherwise.
+    y = np.loadtxt(get_graph_labels_path(directory)[0])
+    assert len(y) == n_graphs
+
     # Create basic graph structure from adjacency matrix. If available,
     # labels and attributes are added automatically.
     for index in tqdm(range(n_graphs), desc='Creating graph'):
@@ -253,6 +258,9 @@ def load_graphs(directory):
             (local_adjacencies > 0).tolist(),
             mode=ig.ADJ_UNDIRECTED,
         )
+
+        # Required for classification tasks
+        g['label'] = y[index]
 
         if node_labels is not None:
 
@@ -297,12 +305,7 @@ def load_graphs(directory):
 
         graphs.append(g)
 
-    # Get graph labels; note that this file *has* to exist because we
-    # cannot do any classification otherwise.
-    y = np.loadtxt(get_graph_labels_path(directory)[0])
-
-    assert len(graphs) == len(y)
-    return graphs, y
+    return graphs
 
 
 if __name__ == '__main__':
