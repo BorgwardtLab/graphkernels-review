@@ -55,26 +55,37 @@ is specified.
 
     algorithms = {
         'EH': gk.CalculateEdgeHistKernel,
-        'GL': gk.CalculateConnectedGraphletKernel,
+        # FIXME: does not yet work
+        # 'GL': gk.CalculateConnectedGraphletKernel,
         'VH': gk.CalculateVertexHistKernel,
         'WL': gk.CalculateWLKernel,
     }
 
     param_grid = {
-        'WL': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],   # $h$ = number of iterations
-        'GL': [0, 1, 2, 3],                     # $k$ = size of graphlet
+        'WL': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],  # $h$ = number of iterations
+        'GL': [3, 4, 5],                       # $k$ = size of graphlet
     }
 
     os.makedirs(args.output, exist_ok=True)
 
     for algorithm in sorted(tqdm(algorithms.keys(), desc='Algorithm')):
 
-        # FIXME: skipping algorithms with parameters for now
-        if algorithm in param_grid.keys():
-            continue
-
+        # Function to apply to the list of graphs in order to obtain
+        # a kernel matrix.
         f = algorithms[algorithm]
-        K = f(graphs)
 
-        filename = os.path.join(args.output, f'{algorithm}.npz')
-        np.savez(filename, K=K)
+        if algorithm in param_grid.keys():
+
+            matrices = {
+                str(param): f(graphs, par=param)
+                for param in param_grid[algorithm]
+            }
+
+            filename = os.path.join(args.output, f'{algorithm}.npz')
+            np.savez(filename, **matrices)
+
+        else:
+            K = f(graphs)
+
+            filename = os.path.join(args.output, f'{algorithm}.npz')
+            np.savez(filename, K=K)
