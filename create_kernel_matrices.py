@@ -56,7 +56,10 @@ is specified.
     algorithms = {
         'EH': gk.CalculateEdgeHistKernel,
         # FIXME: does not yet work
-        # 'GL': gk.CalculateConnectedGraphletKernel,
+        # 'CGL': gk.CalculateConnectedGraphletKernel,
+        'GL': gk.CalculateGraphletKernel,
+        'SP': gk.CalculateShortestPathKernel,
+        'VEH': gk.CalculateVertexEdgeHistKernel,
         'VH': gk.CalculateVertexHistKernel,
         'WL': gk.CalculateWLKernel,
     }
