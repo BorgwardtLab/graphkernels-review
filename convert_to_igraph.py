@@ -8,6 +8,7 @@
 import argparse
 import logging
 import os
+import sys
 
 import igraph as ig
 import numpy as np
@@ -89,13 +90,13 @@ def load_graphs(directory):
     logging.info('Loading adjacency matrix and graph indicator files...')
 
     A = np.loadtxt(get_adjacency_matrix_path(directory)[0], delimiter=',')
-    I = np.loadtxt(get_graph_indicator_path(directory)[0])
+    G = np.loadtxt(get_graph_indicator_path(directory)[0])
 
     # Total number of edges stored in the full adjacency matrix of *all*
-    # graphs; while the total number of vertices is taken from `I`, i.e.
+    # graphs; while the total number of vertices is taken from `G`, i.e.
     # the graph indicator matrix.
     n_edges = A.shape[0]
-    n_vertices = I.shape[0]
+    n_vertices = G.shape[0]
 
     # Get source indices and target indices; note that we correct the
     # data format because we want *our* indices to start at zero.
@@ -118,10 +119,10 @@ def load_graphs(directory):
 
     # The graph indicator matrix is supposed to start with an index of
     # `1`, as well. This needs to be corrected for.
-    assert np.min(I) == 1
+    assert np.min(G) == 1
 
-    I = I - 1
-    n_graphs = len(np.unique(I))
+    G = G - 1
+    n_graphs = len(np.unique(G))
 
     graphs = []
 
@@ -247,7 +248,7 @@ def load_graphs(directory):
 
         # This is the 'lookup' vector that contains only those
         # vertex indices pertaining to the current graph.
-        graph_indices = np.where(I == index)[0]
+        graph_indices = np.where(G == index)[0]
 
         local_adjacencies = all_adjacencies[graph_indices, :]
         local_adjacencies = local_adjacencies[:, graph_indices]
@@ -311,6 +312,16 @@ def load_graphs(directory):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('INPUT', type=str, help='Input directory')
+    parser.add_argument(
+        '-f', '--force', action='store_true',
+        help='If specified, overwrites data'
+    )
+    parser.add_argument(
+        '-o', '--output',
+        required=True,
+        type=str,
+        help='Output directory'
+    )
 
     args = parser.parse_args()
 
@@ -319,4 +330,28 @@ if __name__ == '__main__':
         format=None
     )
 
-    graphs = load_graphs(args.INPUT)
+    # Check if the output directory already contains some files. If so,
+    # do not run the script unless `--force` has been specified.
+    if os.path.exists(args.output) and not args.force:
+        logging.error('''
+Output directory already exists. Refusing to continue unless `--force`
+is specified.
+        ''')
+
+        sys.exit(-1)
+
+    directory = os.path.abspath(args.INPUT)
+    graphs = load_graphs(directory)
+    n_graphs = len(graphs)
+
+    n_digits = int(np.ceil(np.log10(n_graphs)))
+
+    logging.info(f'Writing graphs to {args.output}...')
+
+    os.makedirs(directory)
+
+    for index, graph in tqdm(enumerate(graphs), desc='Graph'):
+        filename = f'{index:0{n_digits}d}.pickle'
+        filename = os.path.join(args.output, filename)
+
+        graph.write_picklez(filename)
