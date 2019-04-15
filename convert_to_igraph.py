@@ -106,9 +106,11 @@ def load_graphs(directory):
     assert np.min(target_indices) >= 0
 
     # Build large adjacency matrix that contains *all* adjacencies
-    # between all graphs.
+    # between all graphs. Notice that we iterate over all edges in
+    # the loop. We do not make any assumptions about *directed* or
+    # *undirected* ones (at least not at this point).
     all_adjacencies = np.zeros((n_vertices, n_vertices), dtype=int)
-    for index in range(n_vertices):
+    for index in range(n_edges):
         source_index = source_indices[index]
         target_index = target_indices[index]
 
@@ -153,6 +155,19 @@ def load_graphs(directory):
         # not aware of these in the benchmark data sets so far.
         edge_labels = np.loadtxt(path)
         assert edge_labels.shape[0] == n_edges
+
+        M = np.empty((n_vertices, n_vertices))
+
+        for index in tqdm(range(n_edges), desc='Edge'):
+            source_index = source_indices[index]
+            target_index = target_indices[index]
+
+            M[source_index, target_index] = edge_labels[index]
+
+        # Replace the *vector* of edge labels with a proper matrix of
+        # edge labels in order to make the assignment easier later on
+        # during graph construction.
+        edge_labels = M
 
     else:
         edge_labels = None
@@ -202,7 +217,7 @@ def load_graphs(directory):
         logging.info('Loading edge attributes...')
 
         edge_attributes = np.loadtxt(path, delimiter=',')
-        assert edge_attributes.shape[0] == n_vertices
+        assert edge_attributes.shape[0] == n_edges
 
     else:
         edge_attributes = None
@@ -214,7 +229,7 @@ def load_graphs(directory):
     for index in tqdm(range(n_graphs), desc='Creating graph'):
 
         # This is the 'lookup' vector that contains only those
-        # vertex/edge indices pertaining to the current graph.
+        # vertex indices pertaining to the current graph.
         graph_indices = np.where(I == index)[0]
 
         local_adjacencies = all_adjacencies[graph_indices, :]
@@ -222,7 +237,10 @@ def load_graphs(directory):
 
         # Only existing (i.e. non-zero) edges will be added to the
         # current graph.
-        g = ig.Graph.Adjacency((local_adjacencies > 0).tolist())
+        g = ig.Graph.Adjacency(
+            (local_adjacencies > 0).tolist(),
+            mode=ig.ADJ_UNDIRECTED,
+        )
 
         if node_labels is not None:
 
@@ -234,11 +252,12 @@ def load_graphs(directory):
 
         if edge_labels is not None:
 
-            # Ensures that the dimension/cardinality of the two vectors
-            # makes sense.
-            assert len(edge_labels[graph_indices]) == g.ecount()
+            # Look up the proper sub-matrix of the matrix containing
+            # *all* edge labels.
+            edge_labels_ = edge_labels[graph_indices, :]
+            edge_labels_ = edge_labels_[:, graph_indices]
 
-            g.es['label'] = edge_labels[graph_indices]
+            g.es['label'] = [edge_labels_[i, j] for i, j in g.get_edgelist()]
 
         # Note that we can use the _regular_ index from the `for` loop
         # here because there is only *one* attribute vector per graph.
