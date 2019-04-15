@@ -350,7 +350,7 @@ is specified.
 
     os.makedirs(args.output, exist_ok=True)
 
-    for index, graph in tqdm(enumerate(graphs), desc='Graph'):
+    for index, graph in enumerate(tqdm(graphs, desc='Graph')):
         filename = f'{index:0{n_digits}d}.pickle'
         filename = os.path.join(args.output, filename)
 
