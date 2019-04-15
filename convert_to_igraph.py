@@ -59,6 +59,27 @@ def get_node_labels_path(directory):
     return path, os.path.exists(path)
 
 
+def get_graph_attributes_path(directory):
+    name = get_data_set_name(directory)
+    path = os.path.join(directory, f'{name}_graph_attributes.txt')
+
+    return path, os.path.exists(path)
+
+
+def get_node_attributes_path(directory):
+    name = get_data_set_name(directory)
+    path = os.path.join(directory, f'{name}_node_attributes.txt')
+
+    return path, os.path.exists(path)
+
+
+def get_edge_attributes_path(directory):
+    name = get_data_set_name(directory)
+    path = os.path.join(directory, f'{name}_edge_attributes.txt')
+
+    return path, os.path.exists(path)
+
+
 def load_graphs(directory):
     '''
     Loads a set of graphs from the specified directory. The attributes
@@ -102,8 +123,10 @@ def load_graphs(directory):
 
     graphs = []
 
-    # Check whether there are vertex (node) labels. We load them prior
-    # to creating the graph because we want to add them directly.
+    ####################################################################
+    # Node labels
+    ####################################################################
+
     path, exists = get_node_labels_path(directory)
     if exists:
 
@@ -112,11 +135,15 @@ def load_graphs(directory):
         # TODO: do we have to support textual node labels as well? I am
         # not aware of these in the benchmark data sets so far.
         node_labels = np.loadtxt(path)
+        assert node_labels.shape[0] == n_vertices
+
     else:
         node_labels = None
 
-    # Check whether there are edge labels. Again, we load them prior to
-    # creating the graph because we want to add them directly.
+    ####################################################################
+    # Edge labels
+    ####################################################################
+
     path, exists = get_edge_labels_path(directory)
     if exists:
 
@@ -125,13 +152,65 @@ def load_graphs(directory):
         # TODO: do we have to support textual edge labels as well? I am
         # not aware of these in the benchmark data sets so far.
         edge_labels = np.loadtxt(path)
+        assert edge_labels.shape[0] == n_edges
+
     else:
         edge_labels = None
 
+    ####################################################################
+    # Graph attributes
+    ####################################################################
+
+    path, exists = get_graph_attributes_path(directory)
+    if exists:
+
+        logging.info('Loading graph attributes...')
+
+        # TODO: not sure whether this conversion is the most suitable
+        # way; it is not documented whether a graph can have multiple
+        # attributes or not.
+        graph_attributes = np.loadtxt(path, delimiter=',')
+        assert graph_attributes.shape[0] == n_vertices
+
+    else:
+        graph_attributes = None
+
+    ####################################################################
+    # Node attributes
+    ####################################################################
+
+    path, exists = get_node_attributes_path(directory)
+    if exists:
+
+        logging.info('Loading node attributes...')
+
+        node_attributes = np.loadtxt(path, delimiter=',')
+        assert node_attributes.shape[0] == n_vertices
+
+    else:
+        node_attributes = None
+
     logging.info('Starting graph creation process...')
 
-    # Create basic graph structure from adjacency matrix. This does
-    # *not* yet add any vertices or labels.
+    ####################################################################
+    # Edge attributes
+    ####################################################################
+
+    path, exists = get_edge_attributes_path(directory)
+    if exists:
+
+        logging.info('Loading edge attributes...')
+
+        edge_attributes = np.loadtxt(path, delimiter=',')
+        assert edge_attributes.shape[0] == n_vertices
+
+    else:
+        edge_attributes = None
+
+    logging.info('Starting graph creation process...')
+
+    # Create basic graph structure from adjacency matrix. If available,
+    # labels and attributes are added automatically.
     for index in tqdm(range(n_graphs), desc='Creating graph'):
         graph_indices = np.where(I == index)[0]
 
@@ -146,9 +225,14 @@ def load_graphs(directory):
         if edge_labels is not None:
             g.es['label'] = edge_labels[graph_indices]
 
+        graphs.append(g)
+
     # Get graph labels; note that this file *has* to exist because we
     # cannot do any classification otherwise.
     y = np.loadtxt(get_graph_labels_path(directory)[0])
+
+    assert len(graphs) == len(y)
+    return graphs, y
 
 
 if __name__ == '__main__':
