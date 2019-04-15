@@ -170,7 +170,7 @@ def load_graphs(directory):
         # way; it is not documented whether a graph can have multiple
         # attributes or not.
         graph_attributes = np.loadtxt(path, delimiter=',')
-        assert graph_attributes.shape[0] == n_vertices
+        assert graph_attributes.shape[0] == n_graphs
 
     else:
         graph_attributes = None
@@ -224,6 +224,17 @@ def load_graphs(directory):
 
         if edge_labels is not None:
             g.es['label'] = edge_labels[graph_indices]
+
+        # Note that we can use the _regular_ index from the `for` loop
+        # here because there is only *one* attribute vector per graph.
+        if graph_attributes is not None:
+            g['attribute'] = graph_attributes[index]
+
+        if node_attributes is not None:
+            g.vs['attribute'] = node_attributes[graph_indices]
+
+        if edge_attributes is not None:
+            g.es['attribute'] = edge_attributes[graph_indices]
 
         graphs.append(g)
 
