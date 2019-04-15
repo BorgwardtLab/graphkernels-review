@@ -265,6 +265,11 @@ def load_graphs(directory):
             g['attribute'] = graph_attributes[index]
 
         if node_attributes is not None:
+
+            # Ensures that the assignment works as expected and does not
+            # miss any vertices.
+            assert len(node_attributes[graph_indices]) == g.vcount()
+
             g.vs['attribute'] = node_attributes[graph_indices]
 
         if edge_attributes is not None:
