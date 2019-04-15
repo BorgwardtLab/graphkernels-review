@@ -23,12 +23,37 @@ def get_data_set_name(directory):
 
 def get_adjacency_matrix_path(directory):
     name = get_data_set_name(directory)
-    return os.path.join(directory, f'{name}_A.txt')
+    path = os.path.join(directory, f'{name}_A.txt')
+
+    return path, os.path.exists(path)
 
 
 def get_graph_indicator_path(directory):
     name = get_data_set_name(directory)
-    return os.path.join(directory, f'{name}_A.txt')
+    path = os.path.join(directory, f'{name}_graph_indicator.txt')
+
+    return path, os.path.exists(path)
+
+
+def get_graph_labels_path(directory):
+    name = get_data_set_name(directory)
+    path = os.path.join(directory, f'{name}_graph_labels.txt')
+
+    return path, os.path.exists(path)
+
+
+def get_edge_labels_path(directory):
+    name = get_data_set_name(directory)
+    path = os.path.join(directory, f'{name}_edge_labels.txt')
+
+    return path, os.path.exists(path)
+
+
+def get_node_labels_path(directory):
+    name = get_data_set_name(directory)
+    path = os.path.join(directory, f'{name}_node_labels.txt')
+
+    return path, os.path.exists(path)
 
 
 def load_graphs(directory):
@@ -37,8 +62,10 @@ def load_graphs(directory):
     and labels will be loaded automatically, if present.
     '''
 
-    A = np.loadtxt(get_adjacency_matrix_path(directory), delimiter=',')
-    I = np.loadtxt(get_graph_indicator_path(directory), delimiter=',')
+    logging.info('Loading adjacency matrix and graph indicator files...')
+
+    A = np.loadtxt(get_adjacency_matrix_path(directory)[0], delimiter=',')
+    I = np.loadtxt(get_graph_indicator_path(directory)[0])
 
     # Total number of edges stored in the full adjacency matrix of *all*
     # graphs; while the total number of vertices is taken from `I`, i.e.
@@ -70,11 +97,49 @@ def load_graphs(directory):
     I = I - 1
     n_graphs = len(np.unique(I))
 
+    graphs = []
+
+    # Check whether there are vertex (node) labels. We load them prior
+    # to creating the graph because we want to add them directly.
+    path, exists = get_node_labels_path(directory)
+    if exists:
+
+        logging.info('Loading node labels...')
+
+        # TODO: do we have to support textual node labels as well? I am
+        # not aware of these in the benchmark data sets so far.
+        node_labels = np.loadtxt(path)
+    else:
+        node_labels = None
+
+    # Check whether there are edge labels. Again, we load them prior to
+    # creating the graph because we want to add them directly.
+    path, exists = get_edge_labels_path(directory)
+    if exists:
+
+        logging.info('Loading edge labels...')
+
+        # TODO: do we have to support textual edge labels as well? I am
+        # not aware of these in the benchmark data sets so far.
+        edge_labels = np.loadtxt(path)
+    else:
+        edge_labels = None
+
+    logging.info('Starting graph creation process...')
+
+    # Create basic graph structure from adjacency matrix. This does
+    # *not* yet add any vertices or labels.
     for index in range(n_graphs):
         graph_indices = np.where(I == index)[0]
 
         local_adjacencies = all_adjacencies[graph_indices, :]
         local_adjacencies = local_adjacencies[:, graph_indices]
+
+        g = ig.Graph.Adjacency((local_adjacencies > 0).tolist())
+
+    # Get graph labels; note that this file *has* to exist because we
+    # cannot do any classification otherwise.
+    y = np.loadtxt(get_graph_labels_path(directory)[0])
 
 
 if __name__ == '__main__':
@@ -82,5 +147,10 @@ if __name__ == '__main__':
     parser.add_argument('INPUT', type=str, help='Input directory')
 
     args = parser.parse_args()
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format=None
+    )
 
     graphs = load_graphs(args.INPUT)
