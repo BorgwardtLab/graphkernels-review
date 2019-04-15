@@ -212,11 +212,16 @@ def load_graphs(directory):
     # Create basic graph structure from adjacency matrix. If available,
     # labels and attributes are added automatically.
     for index in tqdm(range(n_graphs), desc='Creating graph'):
+
+        # This is the 'lookup' vector that contains only those
+        # vertex/edge indices pertaining to the current graph.
         graph_indices = np.where(I == index)[0]
 
         local_adjacencies = all_adjacencies[graph_indices, :]
         local_adjacencies = local_adjacencies[:, graph_indices]
 
+        # Only existing (i.e. non-zero) edges will be added to the
+        # current graph.
         g = ig.Graph.Adjacency((local_adjacencies > 0).tolist())
 
         if node_labels is not None:
