@@ -221,9 +221,8 @@ if __name__ == '__main__':
     cv = StratifiedKFold(
         n_splits=n_folds,
         shuffle=True,
-        random_state=42 # TODO: make configurable?
+        random_state=42  # TODO: make configurable?
     )
-
 
     for name, matrix in matrices.items():
 
