@@ -224,12 +224,16 @@ if __name__ == '__main__':
         random_state=42 # TODO: make configurable?
     )
 
-    for iteration in range(n_iterations):
-        for train_index, test_index in cv.split(all_indices, y):
-            train_indices = all_indices[train_index]
-            test_indices = all_indices[test_index]
 
-            for name, matrix in matrices.items():
+    for name, matrix in matrices.items():
+
+        print(f'Kernel name: {name}')
+
+        for iteration in range(n_iterations):
+            for train_index, test_index in cv.split(all_indices, y):
+                train_indices = all_indices[train_index]
+                test_indices = all_indices[test_index]
+
                 # Main function for training and testing a certain kernel
                 # matrix on the data set.
                 train_and_test(
