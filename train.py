@@ -11,6 +11,7 @@ import os
 import numpy as np
 
 from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
 from sklearn.model_selection import StratifiedKFold
 
 from tqdm import tqdm
@@ -46,7 +47,6 @@ def grid_search_cv(
     :param kernel_matrices: Kernel matrices to check; each one of them
     is assumed to represent a different choice of parameter. They will
     *all* be checked iteratively by the routine.
-    :param y: Labels (used for scoring)
 
     :return: Best classifier, fitted using the best parameters and ready
     for further predictions.
@@ -77,6 +77,36 @@ def grid_search_cv(
     #ret_model = clone(model).set_params(**params[best_idx]['params'])
     #return ret_model.fit(precomputed_kernels[params[best_idx]['K_idx']], y), params[best_idx]
 
+def train_and_test(train_indices, test_indices, matrices):
+    '''
+    Trains the classifier on a set of kernel matrices (that are all
+    assumed to come from the same algorithm). This uses pre-defined
+    splits to prevent information leakage.
+
+    :param train_indices: Indices to be used for training
+    :param test_indices: Indices to be used for testing
+    :param matrices: Kernel matrices belonging to some algorithm
+    '''
+
+    clf = SVC(kernel='precomputed')
+    y = matrices['y']
+
+    for key, K in matrices.items():
+
+        # Skip labels, for they must not be used for fitting
+        if key == 'y':
+            continue
+
+        K_train = K[train_indices][:, train_indices]
+        clf.fit(K_train, y[train_indices])
+
+        y_test = y[test_indices]
+        K_test = K[test_indices][:, train_indices]
+        y_pred = clf.predict(K_test)
+
+        accuracy = accuracy_score(y_test, y_pred)
+        print(f'{accuracy * 100:2.2f}')
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -105,6 +135,7 @@ if __name__ == '__main__':
     logging.info('Checking input data and preparing splits...')
 
     n_graphs = None
+    y = None
 
     for name, matrix in tqdm(matrices.items(), 'File'):
         for parameter in matrix:
@@ -114,6 +145,11 @@ if __name__ == '__main__':
             if parameter != 'y':
                 # A kernel matrix needs to be square
                 assert M.shape[0] == M.shape[1]
+            else:
+                if y is None:
+                    y = M
+                else:
+                    assert y.shape == M.shape
 
             # Either set the number of graphs, or check that each matrix
             # contains the same number of them.
@@ -123,3 +159,29 @@ if __name__ == '__main__':
                 assert n_graphs == M.shape[0]
 
     clf = SVC(kernel='precomputed')
+
+    # Prepare cross-validated indices for the training data set.
+    # Ideally, they should be loaded from *outside*.
+    all_indices = np.arange(n_graphs)
+    n_iterations = 10
+    n_folds = 10
+
+    cv = StratifiedKFold(
+        n_splits=n_folds,
+        shuffle=True,
+        random_state=42 # TODO: make configurable?
+    )
+
+    for iteration in range(n_iterations):
+        for train_index, test_index in cv.split(all_indices, y):
+            train_indices = all_indices[train_index]
+            test_indices = all_indices[test_index]
+
+            for name, matrix in matrices.items():
+                # Main function for training and testing a certain kernel
+                # matrix on the data set.
+                train_and_test(
+                    train_indices,
+                    test_indices,
+                    matrix
+                )
