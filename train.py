@@ -111,8 +111,9 @@ if __name__ == '__main__':
 
             M = matrix[parameter]
 
-            # A kernel matrix needs to be square
-            assert M.shape[0] == M.shape[1]
+            if parameter != 'y':
+                # A kernel matrix needs to be square
+                assert M.shape[0] == M.shape[1]
 
             # Either set the number of graphs, or check that each matrix
             # contains the same number of them.
