@@ -6,6 +6,7 @@
 
 
 import argparse
+import gc
 import logging
 import os
 import sys
@@ -259,6 +260,9 @@ def load_graphs(directory):
             (local_adjacencies > 0).tolist(),
             mode=ig.ADJ_UNDIRECTED,
         )
+
+        del local_adjacencies
+        gc.collect()
 
         # Required for classification tasks
         g['label'] = y[index]
