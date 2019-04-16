@@ -10,9 +10,13 @@ import os
 
 import numpy as np
 
+from sklearn.base import clone
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import make_scorer
+from sklearn.model_selection import ParameterGrid
 from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection._validation import _fit_and_score
 
 from tqdm import tqdm
 
@@ -54,42 +58,68 @@ def grid_search_cv(
         random_state=42  # TODO: make configurable
     )
 
+    best_clf = None
+    best_accuracy = 0.0
+    best_parameters = {}
+
     # From this point on, `train_index` and `test_index` are supposed to
     # be understood *relative* to the input training indices.
     for train_index, test_index in cv.split(train_indices, y):
-        for parameter, K in kernel_matrices.items():
+        for K_param, K in kernel_matrices.items():
 
             # Skip labels; we could also remove them from the set of
             # matrices but this would make the function inconsistent
             # because it should *not* fiddle with the input data set
             # if it can be avoided.
-            if parameter == 'y':
+            if K_param == 'y':
                 continue
 
-    # Custom model for an array of precomputed kernels
-    # 1. Stratified K-fold
-    #cv = StratifiedKFold(n_splits=cv, shuffle=False)
-    #results = []
-    #for train_index, test_index in cv.split(precomputed_kernels[0], y):
-    #    split_results = []
-    #    params = [] # list of dict, its the same for every split
-    #    # run over the kernels first
-    #    for K_idx, K in enumerate(precomputed_kernels):
-    #        # Run over parameters
-    #        for p in list(ParameterGrid(param_grid)):
-    #            sc = _fit_and_score(clone(model), K, y, scorer=make_scorer(accuracy_score), 
-    #                    train=train_index, test=test_index, verbose=0, parameters=p, fit_params=None)
-    #            split_results.append(sc)
-    #            params.append({'K_idx': K_idx, 'params': p})
-    #    results.append(split_results)
-    ## Collect results and average
-    #results = np.array(results)
-    #fin_results = results.mean(axis=0)
-    ## select the best results
-    #best_idx = np.argmax(fin_results)
-    ## Return the fitted model and the best_parameters
-    #ret_model = clone(model).set_params(**params[best_idx]['params'])
-    #return ret_model.fit(precomputed_kernels[params[best_idx]['K_idx']], y), params[best_idx]
+            # This ensures that we *cannot* access the test indices,
+            # even if we try :)
+            K = K[train_indices][:, train_indices]
+
+            # Starts enumerating all 'inner' parameters, i.e. the ones
+            # that pertain to the classifier (and potentially how this
+            # matrix should be treated)
+            for parameters in list(param_grid):
+                if parameters['normalize']:
+                    # TODO: normalize kernel matrix
+                    pass
+
+                # Remove the parameter because it does not pertain to
+                # the classifier below.
+                clf_parameters = {
+                    key: value for key, value in parameters.items()
+                    if key not in ['normalize']
+                }
+
+                accuracy, params = _fit_and_score(
+                    clone(clf),
+                    K, y,
+                    scorer=make_scorer(accuracy_score),
+                    train=train_index,
+                    test=test_index,
+                    verbose=0,
+                    parameters=clf_parameters,
+                    fit_params=None,  # No additional parameters for `fit()`
+                    return_parameters=True,
+                )
+
+                # Note that when storing the parameters, we can re-use
+                # the original grid because we want to know about this
+                # normalization.
+                if accuracy > best_accuracy:
+                    best_clf = clone(clf).set_params(**params)
+                    best_accuracy = accuracy
+                    best_parameters = parameters
+
+                    # Update kernel matrix parameter to indicate which
+                    # matrix was used to obtain these results. The key
+                    # will also be returned later on.
+                    best_parameters['K'] = K_param
+
+    return clf, kernel_matrices[best_parameters['K']]
+
 
 def train_and_test(train_indices, test_indices, matrices):
     '''
@@ -113,7 +143,7 @@ def train_and_test(train_indices, test_indices, matrices):
         SVC(kernel='precomputed'),
         train_indices,
         n_folds=5,
-        param_grid=param_grid,
+        param_grid=ParameterGrid(param_grid),
         kernel_matrices=matrices
     )
 
