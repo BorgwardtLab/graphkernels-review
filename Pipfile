@@ -9,6 +9,7 @@ verify_ssl = true
 python-igraph = "*"
 numpy = "*"
 tqdm = "*"
+scikit-learn = "*"
 
 [requires]
 python_version = "3.7"
