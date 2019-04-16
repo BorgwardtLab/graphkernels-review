@@ -5,6 +5,7 @@
 # the best results.
 
 import argparse
+import logging
 import os
 
 import numpy as np
@@ -87,9 +88,37 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    logging.basicConfig(
+        level=logging.INFO,
+        format=None
+    )
+
+    logging.info('Loading input data...')
+
     # Load *all* matrices; each one of the is assumed to represent
     # a certain input data set.
     matrices = {
         os.path.splitext(os.path.basename(filename))[0]:
             np.load(filename) for filename in tqdm(args.MATRIX, desc='File')
     }
+
+    logging.info('Checking input data and preparing splits...')
+
+    n_graphs = None
+
+    for name, matrix in tqdm(matrices.items(), 'File'):
+        for parameter in matrix:
+
+            M = matrix[parameter]
+
+            # A kernel matrix needs to be square
+            assert M.shape[0] == M.shape[1]
+
+            # Either set the number of graphs, or check that each matrix
+            # contains the same number of them.
+            if n_graphs is None:
+                n_graphs = M.shape[0]
+            else:
+                assert n_graphs == M.shape[0]
+
+    clf = SVC(kernel='precomputed')
