@@ -17,21 +17,12 @@ from sklearn.model_selection import StratifiedKFold
 from tqdm import tqdm
 
 
-# Parameter grid for the classifier, but also for the 'pre-processing'
-# of a kernel matrix.
-param_grid = {
-    'C': 10. ** np.arange(-3, 4),  # 10^{-3}..10^{3}
-    'normalize': [False, True]
-}
-
-
 def grid_search_cv(
     clf,
     train_indices,
     n_folds,
     param_grid,
     kernel_matrices,
-    y
 ):
     '''
     Internal grid search routine for a set of kernel matrices. The
@@ -48,9 +39,32 @@ def grid_search_cv(
     is assumed to represent a different choice of parameter. They will
     *all* be checked iteratively by the routine.
 
-    :return: Best classifier, fitted using the best parameters and ready
-    for further predictions.
+    :return: Best classifier, i.e. the classifier with the best
+    parameters. Needs to be refit prior to predicting labels on
+    the test data set. Moreover, the best-performing matrix, in
+    terms of the grid search, is returned. It has to be used in
+    all subsequent prediction tasks.
     '''
+
+    y = kernel_matrices['y'][train_indices]
+
+    cv = StratifiedKFold(
+        n_splits=n_folds,
+        shuffle=True,
+        random_state=42  # TODO: make configurable
+    )
+
+    # From this point on, `train_index` and `test_index` are supposed to
+    # be understood *relative* to the input training indices.
+    for train_index, test_index in cv.split(train_indices, y):
+        for parameter, K in kernel_matrices.items():
+
+            # Skip labels; we could also remove them from the set of
+            # matrices but this would make the function inconsistent
+            # because it should *not* fiddle with the input data set
+            # if it can be avoided.
+            if parameter == 'y':
+                continue
 
     # Custom model for an array of precomputed kernels
     # 1. Stratified K-fold
@@ -88,24 +102,32 @@ def train_and_test(train_indices, test_indices, matrices):
     :param matrices: Kernel matrices belonging to some algorithm
     '''
 
-    clf = SVC(kernel='precomputed')
-    y = matrices['y']
+    # Parameter grid for the classifier, but also for the 'pre-processing'
+    # of a kernel matrix.
+    param_grid = {
+        'C': 10. ** np.arange(-3, 4),  # 10^{-3}..10^{3}
+        'normalize': [False, True]
+    }
 
-    for key, K in matrices.items():
+    clf, K = grid_search_cv(
+        SVC(kernel='precomputed'),
+        train_indices,
+        n_folds=5,
+        param_grid=param_grid,
+        kernel_matrices=matrices
+    )
 
-        # Skip labels, for they must not be used for fitting
-        if key == 'y':
-            continue
+    # Refit the classifier on the test data set; using the kernel matrix
+    # that performed best in the hyperparameter search.
+    K_train = K[train_indices][:, train_indices]
+    clf.fit(K_train, y[train_indices])
 
-        K_train = K[train_indices][:, train_indices]
-        clf.fit(K_train, y[train_indices])
+    y_test = y[test_indices]
+    K_test = K[test_indices][:, train_indices]
+    y_pred = clf.predict(K_test)
 
-        y_test = y[test_indices]
-        K_test = K[test_indices][:, train_indices]
-        y_pred = clf.predict(K_test)
-
-        accuracy = accuracy_score(y_test, y_pred)
-        print(f'{accuracy * 100:2.2f}')
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f'{accuracy * 100:2.2f}')
 
 
 if __name__ == '__main__':
