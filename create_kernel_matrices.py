@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 #
 # create_kernel_matrices.py: Given a set of graphs, applies a number of
-# graph kernels to them and stores the resulting kernel matrices.
+# graph kernels and stores the resulting kernel matrices. Moreover, the
+# script also stored the labels inside each set of matrices (under `y`)
+# in order to make the output self-contained.
 
 import argparse
 import logging
@@ -53,6 +55,8 @@ is specified.
         tqdm(args.FILE, desc='File')
     ]
 
+    y = np.array([g['label'] for g in graphs])
+
     algorithms = {
         'EH': gk.CalculateEdgeHistKernel,
         # FIXME: does not yet work
@@ -84,6 +88,10 @@ is specified.
                 for param in param_grid[algorithm]
             }
 
+            # Store the label vector of the graph data set along with
+            # the set of matrices.
+            matrices['y'] = y
+
             filename = os.path.join(args.output, f'{algorithm}.npz')
             np.savez(filename, **matrices)
 
@@ -91,4 +99,4 @@ is specified.
             K = f(graphs)
 
             filename = os.path.join(args.output, f'{algorithm}.npz')
-            np.savez(filename, K=K)
+            np.savez(filename, K=K, y=y)
