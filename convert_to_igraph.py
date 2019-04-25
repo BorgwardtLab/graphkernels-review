@@ -16,6 +16,9 @@ import numpy as np
 
 from tqdm import tqdm
 
+from scipy.sparse import csr_matrix
+from scipy.sparse import dok_matrix
+
 
 def get_data_set_name(directory):
 
@@ -111,12 +114,16 @@ def load_graphs(directory):
     # between all graphs. Notice that we iterate over all edges in
     # the loop. We do not make any assumptions about *directed* or
     # *undirected* ones (at least not at this point).
-    all_adjacencies = np.zeros((n_vertices, n_vertices), dtype=int)
+    all_adjacencies = dok_matrix((n_vertices, n_vertices), dtype=int)
     for index in range(n_edges):
         source_index = source_indices[index]
         target_index = target_indices[index]
 
         all_adjacencies[source_index, target_index] = 1
+
+    # Convert this to a CSR matrix in order to make slicing operations
+    # easier.
+    all_adjacencies = all_adjacencies.tocsr()
 
     # The graph indicator matrix is supposed to start with an index of
     # `1`, as well. This needs to be corrected for.
@@ -251,8 +258,11 @@ def load_graphs(directory):
         # vertex indices pertaining to the current graph.
         graph_indices = np.where(G == index)[0]
 
+        # We first use slices to access the relevant indices, then we
+        # convert to a proper `numpy.array`.
         local_adjacencies = all_adjacencies[graph_indices, :]
         local_adjacencies = local_adjacencies[:, graph_indices]
+        local_adjacencies = local_adjacencies.toarray()
 
         # Only existing (i.e. non-zero) edges will be added to the
         # current graph.
