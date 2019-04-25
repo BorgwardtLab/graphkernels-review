@@ -83,10 +83,17 @@ is specified.
 
         if algorithm in param_grid.keys():
 
-            matrices = {
-                str(param): f(graphs, par=param)
-                for param in param_grid[algorithm]
-            }
+            try:
+                matrices = {
+                    str(param): f(graphs, par=param)
+                    for param in param_grid[algorithm]
+                }
+            except NotImplementedError:
+                logging.warning(f'''
+Caught exception for {algorithm}; continuing with the next algorithm and
+its corresponding parameter grid.
+                ''')
+                continue
 
             # Store the label vector of the graph data set along with
             # the set of matrices.
