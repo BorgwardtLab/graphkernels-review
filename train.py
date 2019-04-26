@@ -6,6 +6,7 @@
 
 import argparse
 import logging
+import json
 import os
 
 import numpy as np
@@ -180,8 +181,8 @@ def train_and_test(train_indices, test_indices, matrices):
     results['test_indices'] = test_indices
     results['accuracy'] = accuracy
     results['best_model'] = best_parameters
-    results['y_test'] = y_test
-    results['y_pred'] = y_pred
+    results['y_test'] = y_test.tolist()
+    results['y_pred'] = y_pred.tolist()
 
     return results
 
@@ -265,6 +266,14 @@ if __name__ == '__main__':
         )
 
         for iteration in range(n_iterations):
+
+            # Prepare results for all folds of the current iteration.
+            # This will collect individual predictions.
+            fold_results = {
+                'accuracy': [],
+                'y_pred': [],
+            }
+
             for train_index, test_index in cv.split(all_indices, y):
                 train_indices = all_indices[train_index]
                 test_indices = all_indices[test_index]
@@ -287,18 +296,20 @@ if __name__ == '__main__':
                 # to be done only for the first kernel matrix.
                 else:
                     all_results['iterations'][iteration] = {
-                        'train_indices': train_indices,
-                        'test_indices': test_indices,
+                        'train_indices': train_indices.tolist(),
+                        'test_indices': test_indices.tolist(),
                         'y_test': results['y_test'],
                         'kernels': {},
                     }
 
-                # Add information about our kernel to this particular
-                # iteration. Since we assume that each kernel is used
-                # only *once*, this does not result in duplicates.
-                all_results['iterations'][iteration]['kernels'][name] = {
-                    'accuracy': results['accuracy'],
-                    'y_pred': results['y_pred'],
-                }
+                # Store per-fold information
+                fold_results['accuracy'].append(results['accuracy'])
+                fold_results['y_pred'].append(results['y_pred'])
 
-    print(all_results)
+            # Collate information about this kernel by storing *all*
+            # results over each fold.
+            all_results['iterations'][iteration]['kernels'][name] = {
+                key: value for key, value in fold_results.items()
+            }
+
+    print(json.dumps(all_results, indent=4))
