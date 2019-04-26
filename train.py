@@ -97,8 +97,7 @@ def grid_search_cv(
             # matrix should be treated)
             for parameters in list(param_grid):
                 if parameters['normalize']:
-                    # TODO: normalize kernel matrix
-                    pass
+                    K = normalize(K)
 
                 # Remove the parameter because it does not pertain to
                 # the classifier below.
