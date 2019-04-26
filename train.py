@@ -21,6 +21,20 @@ from sklearn.model_selection._validation import _fit_and_score
 from tqdm import tqdm
 
 
+def normalize(matrix):
+    '''
+    Normalizes a kernel matrix by dividing through the square root
+    product of the corresponding diagonal entries. This is *not* a
+    linear operation, so it should be treated as a hyperparameter.
+
+    :param matrix: Matrix to normalize
+    :return: Normalized matrix
+    '''
+
+    k = 1.0 / np.sqrt(np.diagonal(matrix))
+    return np.multiply(matrix, np.outer(k, k))
+
+
 def grid_search_cv(
     clf,
     train_indices,
