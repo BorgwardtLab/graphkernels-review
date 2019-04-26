@@ -61,7 +61,8 @@ def grid_search_cv(
     parameters. Needs to be refit prior to predicting labels on
     the test data set. Moreover, the best-performing matrix, in
     terms of the grid search, is returned. It has to be used in
-    all subsequent prediction tasks.
+    all subsequent prediction tasks. Additionally, the function
+    also returns a dictionary of the best parameters.
     '''
 
     y = kernel_matrices['y'][train_indices]
@@ -131,7 +132,7 @@ def grid_search_cv(
                     # will also be returned later on.
                     best_parameters['K'] = K_param
 
-    return clf, kernel_matrices[best_parameters['K']]
+    return clf, kernel_matrices[best_parameters['K']], best_parameters
 
 
 def train_and_test(train_indices, test_indices, matrices):
@@ -155,7 +156,7 @@ def train_and_test(train_indices, test_indices, matrices):
         'normalize': [False, True]
     }
 
-    clf, K = grid_search_cv(
+    clf, K, best_parameters = grid_search_cv(
         SVC(kernel='precomputed'),
         train_indices,
         n_folds=5,
@@ -178,7 +179,7 @@ def train_and_test(train_indices, test_indices, matrices):
     results['train_indices'] = train_indices
     results['test_indices'] = test_indices
     results['accuracy'] = accuracy
-    results['best_model'] = clf.best_params_
+    results['best_model'] = best_parameters
     results['y_test'] = y_test
     results['y_pred'] = y_pred
 
