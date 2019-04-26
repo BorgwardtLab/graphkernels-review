@@ -246,6 +246,12 @@ if __name__ == '__main__':
     n_iterations = 10
     n_folds = 10
 
+    # Stores the results of the complete training process, i.e. over
+    # *all* matrices, *all* folds, and so on.
+    all_results = dict()
+    all_results['name'] = 'undefined'  # FIXME: need to add a proper name
+    all_results['iterations'] = dict()
+
     for name, matrix in matrices.items():
 
         print(f'Kernel name: {name}')
@@ -265,8 +271,34 @@ if __name__ == '__main__':
 
                 # Main function for training and testing a certain kernel
                 # matrix on the data set.
-                train_and_test(
+                results = train_and_test(
                     train_indices,
                     test_indices,
                     matrix
                 )
+
+                # We already have information about the folds for this
+                # particular iteration. This works because each kernel
+                # is shown the *same* folds.
+                if iteration in all_results['iterations'].keys():
+                    pass
+
+                # Store information about indices and labels. This has
+                # to be done only for the first kernel matrix.
+                else:
+                    all_results['iterations'][iteration] = {
+                        'train_indices': train_indices,
+                        'test_indices': test_indices,
+                        'y_test': results['y_test'],
+                        'kernels': {},
+                    }
+
+                # Add information about our kernel to this particular
+                # iteration. Since we assume that each kernel is used
+                # only *once*, this does not result in duplicates.
+                all_results['iterations'][iteration]['kernels'][name] = {
+                    'accuracy': results['accuracy'],
+                    'y_pred': results['y_pred'],
+                }
+
+    print(all_results)
