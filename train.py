@@ -214,6 +214,12 @@ if __name__ == '__main__':
         help='Input kernel matrix'
     )
     parser.add_argument(
+        '-n', '--name',
+        type=str,
+        help='Data set name',
+        required=True
+    )
+    parser.add_argument(
         '-o', '--output',
         type=str,
         help='Output file',
@@ -273,7 +279,7 @@ if __name__ == '__main__':
     # Stores the results of the complete training process, i.e. over
     # *all* matrices, *all* folds, and so on.
     all_results = dict()
-    all_results['name'] = 'undefined'  # FIXME: need to add a proper name
+    all_results['name'] = args.name
     all_results['iterations'] = dict()
 
     for name, matrix in matrices.items():
