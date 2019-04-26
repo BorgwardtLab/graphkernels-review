@@ -213,6 +213,12 @@ if __name__ == '__main__':
         type=str,
         help='Input kernel matrix'
     )
+    parser.add_argument(
+        '-o', '--output',
+        type=str,
+        help='Output file',
+        required=True,
+    )
 
     args = parser.parse_args()
 
@@ -335,4 +341,10 @@ if __name__ == '__main__':
                 key: value for key, value in fold_results.items()
             }
 
-    print(json.dumps(all_results, indent=4))
+    # TODO: should ensure that nothing is overwritten here
+    with open(args.output, 'w') as f:
+        json.dump(
+            all_results,
+            f,
+            indent=4
+        )
