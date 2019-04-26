@@ -14,6 +14,10 @@ import numpy as np
 from sklearn.base import clone
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import average_precision_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import roc_auc_score
 from sklearn.metrics import make_scorer
 from sklearn.model_selection import ParameterGrid
 from sklearn.model_selection import StratifiedKFold
@@ -158,7 +162,7 @@ def train_and_test(train_indices, test_indices, matrices):
     }
 
     clf, K, best_parameters = grid_search_cv(
-        SVC(kernel='precomputed'),
+        SVC(kernel='precomputed', probability=True),
         train_indices,
         n_folds=5,
         param_grid=ParameterGrid(param_grid),
@@ -173,14 +177,29 @@ def train_and_test(train_indices, test_indices, matrices):
     y_test = y[test_indices]
     K_test = K[test_indices][:, train_indices]
     y_pred = clf.predict(K_test)
+    y_score = clf.predict_proba(K_test)
 
+    # Prediction-based measures
     accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred)
+    recall = recall_score(y_test, y_pred)
+
+    # Score-based measures
+    auroc = roc_auc_score(y_test, y_score[:, 1])
+    auprc = average_precision_score(y_test, y_score[:, 1])
 
     results = dict()
     results['train_indices'] = train_indices
     results['test_indices'] = test_indices
-    results['accuracy'] = accuracy
     results['best_model'] = best_parameters
+
+    results['accuracy'] = accuracy
+    results['precision'] = precision
+    results['recall'] = recall
+
+    results['auroc'] = auroc
+    results['auprc'] = auprc
+
     results['y_test'] = y_test.tolist()
     results['y_pred'] = y_pred.tolist()
 
@@ -239,8 +258,6 @@ if __name__ == '__main__':
             else:
                 assert n_graphs == M.shape[0]
 
-    clf = SVC(kernel='precomputed')
-
     # Prepare cross-validated indices for the training data set.
     # Ideally, they should be loaded from *outside*.
     all_indices = np.arange(n_graphs)
@@ -270,7 +287,12 @@ if __name__ == '__main__':
             # Prepare results for all folds of the current iteration.
             # This will collect individual predictions.
             fold_results = {
+                'best_model': [],
                 'accuracy': [],
+                'auroc': [],
+                'auprc': [],
+                'precision': [],
+                'recall': [],
                 'y_pred': [],
             }
 
@@ -302,9 +324,10 @@ if __name__ == '__main__':
                         'kernels': {},
                     }
 
-                # Store per-fold information
-                fold_results['accuracy'].append(results['accuracy'])
-                fold_results['y_pred'].append(results['y_pred'])
+                # Store per-fold information. We take whatever
+                # attributes have been selected above.
+                for key in fold_results.keys():
+                    fold_results[key].append(results[key])
 
             # Collate information about this kernel by storing *all*
             # results over each fold.
