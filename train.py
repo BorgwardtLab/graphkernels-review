@@ -143,6 +143,9 @@ def train_and_test(train_indices, test_indices, matrices):
     :param train_indices: Indices to be used for training
     :param test_indices: Indices to be used for testing
     :param matrices: Kernel matrices belonging to some algorithm
+
+    :return: Dictionary containing information about the training
+    process and the trained model.
     '''
 
     # Parameter grid for the classifier, but also for the 'pre-processing'
@@ -170,7 +173,16 @@ def train_and_test(train_indices, test_indices, matrices):
     y_pred = clf.predict(K_test)
 
     accuracy = accuracy_score(y_test, y_pred)
-    print(f'{accuracy * 100:2.2f}')
+
+    results = dict()
+    results['train_indices'] = train_indices
+    results['test_indices'] = test_indices
+    results['accuracy'] = accuracy
+    results['best_model'] = clf.best_params_
+    results['y_test'] = y_test
+    results['y_pred'] = y_pred
+
+    return results
 
 
 if __name__ == '__main__':
@@ -202,6 +214,8 @@ if __name__ == '__main__':
     n_graphs = None
     y = None
 
+    # Check input data by looking at the shape of matrices and their
+    # corresponding label vectors.
     for name, matrix in tqdm(matrices.items(), 'File'):
         for parameter in matrix:
 
@@ -231,15 +245,17 @@ if __name__ == '__main__':
     n_iterations = 10
     n_folds = 10
 
-    cv = StratifiedKFold(
-        n_splits=n_folds,
-        shuffle=True,
-        random_state=42  # TODO: make configurable?
-    )
-
     for name, matrix in matrices.items():
 
         print(f'Kernel name: {name}')
+
+        # Every matrix, i.e. every kernel, gets the *same* folds so that
+        # these results do not have to be stored multiple times.
+        cv = StratifiedKFold(
+            n_splits=n_folds,
+            shuffle=True,
+            random_state=42  # TODO: make configurable?
+        )
 
         for iteration in range(n_iterations):
             for train_index, test_index in cv.split(all_indices, y):
