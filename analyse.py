@@ -7,6 +7,7 @@
 import argparse
 import collections
 import json
+import tabulate
 
 
 import numpy as np
@@ -70,3 +71,12 @@ if __name__ == '__main__':
 
     name = data['name']
     accuracies = collate_performance_measure('accuracy', data)
+
+    df = pd.DataFrame.from_dict(accuracies, orient='index')
+    mean = df.mean(axis=1)
+    std = df.std(axis=1)
+
+    df['mean'] = mean
+    df['std'] = std
+    
+    print(tabulate.tabulate(df, tablefmt='github', headers='keys'))
