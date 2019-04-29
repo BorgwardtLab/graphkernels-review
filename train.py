@@ -5,6 +5,7 @@
 # the best results.
 
 import argparse
+import collections
 import logging
 import json
 import os
@@ -174,6 +175,8 @@ def train_and_test(train_indices, test_indices, matrices):
     K_train = K[train_indices][:, train_indices]
     clf.fit(K_train, y[train_indices])
 
+    print(test_indices)
+
     y_test = y[test_indices]
     K_test = K[test_indices][:, train_indices]
     y_pred = clf.predict(K_test)
@@ -274,7 +277,7 @@ if __name__ == '__main__':
     # Ideally, they should be loaded from *outside*.
     all_indices = np.arange(n_graphs)
     n_iterations = 10
-    n_folds = 10
+    n_folds = 3
 
     # Stores the results of the complete training process, i.e. over
     # *all* matrices, *all* folds, and so on.
@@ -286,30 +289,34 @@ if __name__ == '__main__':
 
         logging.info(f'Kernel name: {name}')
 
-        # Every matrix, i.e. every kernel, gets the *same* folds so that
-        # these results do not have to be stored multiple times.
-        cv = StratifiedKFold(
-            n_splits=n_folds,
-            shuffle=True,
-            random_state=42  # TODO: make configurable?
-        )
-
         for iteration in range(n_iterations):
 
-            # Prepare results for all folds of the current iteration.
-            # This will collect individual predictions.
-            fold_results = {
-                'best_model': [],
-                'accuracy': [],
-                'auroc': [],
-                'auprc': [],
-                'precision': [],
-                'recall': [],
-                'y_pred': [],
-            }
+            # Every matrix, i.e. every kernel, gets the *same* folds so that
+            # these results do not have to be stored multiple times. Yet, we
+            # have to re-initialize this based on the iteration, for we want
+            # different splits there.
+            cv = StratifiedKFold(
+                n_splits=n_folds,
+                shuffle=True,
+                random_state=42 + iteration  # TODO: make configurable?
+            )
 
             for fold_index, (train_index, test_index) in \
                     enumerate(cv.split(all_indices, y)):
+
+                # Prepare results for the current fold of the current
+                # iteration. This will collect individual predictions
+                # even though it will introduce another level.
+                fold_results = {
+                    'best_model': [],
+                    'accuracy': [],
+                    'auroc': [],
+                    'auprc': [],
+                    'precision': [],
+                    'recall': [],
+                    'y_pred': [],
+                }
+
                 train_indices = all_indices[train_index]
                 test_indices = all_indices[test_index]
 
@@ -331,37 +338,37 @@ if __name__ == '__main__':
                 # to be done only for the first kernel matrix.
                 else:
                     all_results['iterations'][iteration] = {
-                        'train_indices': {},
-                        'test_indices': {},
-                        'y_test': results['y_test'],
-                        'kernels': {},
+                        'folds': collections.defaultdict(dict)
                     }
 
                 # Add fold information; this might overwrite one that is
                 # already stored, but since all folds are the same, this
                 # is not a problem.
-                per_iter = all_results['iterations'][iteration]
-                per_iter['train_indices'][fold_index] = train_indices.tolist()
-                per_iter['test_indices'][fold_index] = test_indices.tolist()
+                per_fold = all_results['iterations'][iteration]['folds']
+                per_fold[fold_index]['train_indices'] = train_indices.tolist()
+                per_fold[fold_index]['test_indices'] = test_indices.tolist()
 
                 # Store per-fold information. We take whatever
                 # attributes have been selected above.
                 for key in fold_results.keys():
                     fold_results[key].append(results[key])
 
-            # Collate information about this kernel by storing *all*
-            # results over each fold.
-            kernel_results = all_results['iterations'][iteration]['kernels']
+                # Check whether we are already storing information about
+                # kernels.
+                if 'kernels' not in per_fold[fold_index].keys():
+                    per_fold[fold_index]['kernels'] = {}
 
-            # Create information about kernel if it does not already
-            # exist; this makes it possible to report per-fold data.
-            if name not in kernel_results.keys():
-                kernel_results[name] = dict()
+                kernel_results = per_fold[fold_index]['kernels']
 
-            # Finally store *all* results for the fold
-            kernel_results[name][fold_index] = {
-                key: value for key, value in fold_results.items()
-            }
+                # Create information about kernel if it does not already
+                # exist; this makes it possible to report per-fold data.
+                if name not in per_fold.keys():
+                    kernel_results[name] = dict()
+
+                # Finally store *all* results for the fold
+                kernel_results[name][fold_index] = {
+                    key: value for key, value in fold_results.items()
+                }
 
     # TODO: should ensure that nothing is overwritten here
     with open(args.output, 'w') as f:
