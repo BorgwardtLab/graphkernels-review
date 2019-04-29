@@ -270,7 +270,7 @@ if __name__ == '__main__':
     # Ideally, they should be loaded from *outside*.
     all_indices = np.arange(n_graphs)
     n_iterations = 10
-    n_folds = 3
+    n_folds = 10
 
     # Stores the results of the complete training process, i.e. over
     # *all* matrices, *all* folds, and so on.
