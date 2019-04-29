@@ -329,11 +329,17 @@ if __name__ == '__main__':
                 per_fold = all_results['iterations'][iteration]['folds']
                 per_fold[fold_index]['train_indices'] = train_indices.tolist()
                 per_fold[fold_index]['test_indices'] = test_indices.tolist()
+                per_fold[fold_index]['y_test'] = y[test_indices].tolist()
 
-                # Store per-fold information. We take whatever
-                # attributes have been selected above.
-                for key in fold_results.keys():
-                    fold_results[key].append(results[key])
+                # Prepare results for the current fold of the current
+                # iteration. This will collect individual values, and
+                # thus make it necessary to sum/collate over axes.
+                #
+                # We take whatever information has been supplied by the
+                # function above.
+                fold_results = {
+                    key: value for key, value in results.items()
+                }
 
                 # Check whether we are already storing information about
                 # kernels.
@@ -342,13 +348,11 @@ if __name__ == '__main__':
 
                 kernel_results = per_fold[fold_index]['kernels']
 
-                # Create information about kernel if it does not already
-                # exist; this makes it possible to report per-fold data.
-                if name not in per_fold.keys():
-                    kernel_results[name] = dict()
+                # The results for this kernel on this particular fold
+                # must not have been reported anywhere else.
+                assert name not in kernel_results.keys()
 
-                # Finally store *all* results for the fold
-                kernel_results[name][fold_index] = {
+                kernel_results[name] = {
                     key: value for key, value in fold_results.items()
                 }
 
