@@ -9,6 +9,10 @@ import collections
 import json
 
 
+import numpy as np
+import pandas as pd
+
+
 def collate_performance_measure(measure, data, aggregate='mean'):
     '''
     Collates a performance measure, such as accuracy, over a given data
@@ -29,6 +33,12 @@ def collate_performance_measure(measure, data, aggregate='mean'):
     represent lists of the desired performance measure.
     '''
 
+    aggregate_fn = {
+        'mean': np.mean
+    }
+
+    aggregate_fn = aggregate_fn[aggregate]
+
     # Needs to contain a list by default because each performance
     # measure is reported for every iteration and *every* kernel.
     results = collections.defaultdict(list)
@@ -40,6 +50,11 @@ def collate_performance_measure(measure, data, aggregate='mean'):
         for kernel in kernels:
             data_per_kernel = data_per_iteration['kernels'][kernel]
             values = data_per_kernel[measure]
+            aggregated_value = aggregate_fn(values)
+
+            results[kernel].append(aggregated_value)
+
+    return results
 
 
 if __name__ == '__main__':
