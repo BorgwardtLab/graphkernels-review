@@ -284,7 +284,7 @@ if __name__ == '__main__':
 
     for name, matrix in matrices.items():
 
-        print(f'Kernel name: {name}')
+        logging.info(f'Kernel name: {name}')
 
         # Every matrix, i.e. every kernel, gets the *same* folds so that
         # these results do not have to be stored multiple times.
@@ -308,7 +308,8 @@ if __name__ == '__main__':
                 'y_pred': [],
             }
 
-            for train_index, test_index in cv.split(all_indices, y):
+            for fold_index, (train_index, test_index) in \
+                    enumerate(cv.split(all_indices, y)):
                 train_indices = all_indices[train_index]
                 test_indices = all_indices[test_index]
 
@@ -330,11 +331,18 @@ if __name__ == '__main__':
                 # to be done only for the first kernel matrix.
                 else:
                     all_results['iterations'][iteration] = {
-                        'train_indices': train_indices.tolist(),
-                        'test_indices': test_indices.tolist(),
+                        'train_indices': {},
+                        'test_indices': {},
                         'y_test': results['y_test'],
                         'kernels': {},
                     }
+
+                # Add fold information; this might overwrite one that is
+                # already stored, but since all folds are the same, this
+                # is not a problem.
+                per_iter = all_results['iterations'][iteration]
+                per_iter['train_indices'][fold_index] = train_indices.tolist()
+                per_iter['test_indices'][fold_index] = test_indices.tolist()
 
                 # Store per-fold information. We take whatever
                 # attributes have been selected above.
@@ -343,7 +351,15 @@ if __name__ == '__main__':
 
             # Collate information about this kernel by storing *all*
             # results over each fold.
-            all_results['iterations'][iteration]['kernels'][name] = {
+            kernel_results = all_results['iterations'][iteration]['kernels']
+
+            # Create information about kernel if it does not already
+            # exist; this makes it possible to report per-fold data.
+            if name not in kernel_results.keys():
+                kernel_results[name] = dict()
+
+            # Finally store *all* results for the fold
+            kernel_results[name][fold_index] = {
                 key: value for key, value in fold_results.items()
             }
 
