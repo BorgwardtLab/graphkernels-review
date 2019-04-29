@@ -175,8 +175,6 @@ def train_and_test(train_indices, test_indices, matrices):
     K_train = K[train_indices][:, train_indices]
     clf.fit(K_train, y[train_indices])
 
-    print(test_indices)
-
     y_test = y[test_indices]
     K_test = K[test_indices][:, train_indices]
     y_pred = clf.predict(K_test)
@@ -191,20 +189,15 @@ def train_and_test(train_indices, test_indices, matrices):
     auroc = roc_auc_score(y_test, y_score[:, 1])
     auprc = average_precision_score(y_test, y_score[:, 1])
 
-    results = dict()
-    results['train_indices'] = train_indices
-    results['test_indices'] = test_indices
-    results['best_model'] = best_parameters
-
-    results['accuracy'] = accuracy
-    results['precision'] = precision
-    results['recall'] = recall
-
-    results['auroc'] = auroc
-    results['auprc'] = auprc
-
-    results['y_test'] = y_test.tolist()
-    results['y_pred'] = y_pred.tolist()
+    results = {
+        'best_model': best_parameters,
+        'accuracy': accuracy,
+        'precision': precision,
+        'recall': recall,
+        'auroc': auroc,
+        'auprc': auprc,
+        'y_pred': y_pred.tolist(),
+    }
 
     return results
 
@@ -304,19 +297,8 @@ if __name__ == '__main__':
             for fold_index, (train_index, test_index) in \
                     enumerate(cv.split(all_indices, y)):
 
-                # Prepare results for the current fold of the current
-                # iteration. This will collect individual predictions
-                # even though it will introduce another level.
-                fold_results = {
-                    'best_model': [],
-                    'accuracy': [],
-                    'auroc': [],
-                    'auprc': [],
-                    'precision': [],
-                    'recall': [],
-                    'y_pred': [],
-                }
-
+                # These indices do *not* change for individual kernels,
+                # but we will overwrite them nonetheless.
                 train_indices = all_indices[train_index]
                 test_indices = all_indices[test_index]
 
