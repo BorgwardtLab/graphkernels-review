@@ -59,12 +59,12 @@ def collate_performance_measure(measure, data, aggregate='mean'):
               value = data_per_kernel[measure]
               results_per_fold[kernel].append(value)
 
-          # Aggregate values over all folds to obtain *one* value per
-          # iteration because that is what we need to properly report
-          # everything.
-          for kernel, values in results_per_fold.items():
-            aggregated_value = aggregate_fn(values)
-            results[kernel].append(aggregated_value)
+        # Aggregate values over all folds to obtain *one* value per
+        # iteration because that is what we need to properly report
+        # everything.
+        for kernel, values in results_per_fold.items():
+          aggregated_value = aggregate_fn(values)
+          results[kernel].append(aggregated_value)
 
     return results
 
