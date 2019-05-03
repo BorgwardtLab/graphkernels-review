@@ -226,6 +226,11 @@ def load_graphs(directory):
         edge_attributes = np.loadtxt(path, delimiter=',')
         assert edge_attributes.shape[0] == n_edges
 
+        # Reshape into a proper array to ensure that we can build
+        # a matrix with the attributes below.
+        if len(edge_attributes.shape) == 1:
+            edge_attributes = edge_attributes.reshape(-1, 1)
+
         # Make this into a tensor for subsequent index-based access;
         # this requires only knowledge about the dimension of *each*
         # attribute.
