@@ -16,5 +16,4 @@
 #   ALGORITHM: An abbreviation of one of the algorithms to run. One of
 #   these days, I will document all of them in the repo.
 
-python3 ../src/create_kernel_matrices.py 
-echo "My second parameter is $2"
+python3 ../src/create_kernel_matrices.py -o ./matrices/$1 ./data/$1/*.pickle
