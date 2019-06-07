@@ -20,7 +20,8 @@ from tqdm import tqdm
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('FILE', nargs='+', type=str, help='Input file(s)')
-    parser.add_argument('-a', '--algorithm',
+    parser.add_argument(
+        '-a', '--algorithm',
         nargs='+',
         default=[],
         type=str,
@@ -56,13 +57,15 @@ if __name__ == '__main__':
         'GL': gk.CalculateGraphletKernel,
         'SP': gk.CalculateShortestPathKernel,
         'VEH': gk.CalculateVertexEdgeHistKernel,
+        'VVEH': gk.CalculateVertexVertexEdgeHistKernel,
         'VH': gk.CalculateVertexHistKernel,
         'WL': gk.CalculateWLKernel,
     }
 
     param_grid = {
-        'WL': [0, 1, 2, 3, 4, 5, 6, 7],  # $h$ = number of iterations
-        'GL': [3, 4, 5],                 # $k$ = size of graphlet
+        'WL': [0, 1, 2, 3, 4, 5, 6, 7],   # $h$ = number of iterations
+        'GL': [3, 4, 5],                  # $k$ = size of graphlet
+        'VVEH': 10.0 * np.arange(-2, 3),  # $l$ = regularisation term
     }
 
     # Remove algorithms that have not been specified by the user; this
