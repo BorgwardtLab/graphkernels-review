@@ -20,9 +20,11 @@ from tqdm import tqdm
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('FILE', nargs='+', type=str, help='Input file(s)')
-    parser.add_argument(
-        '-f', '--force', action='store_true',
-        help='If specified, overwrites data'
+    parser.add_argument('-a', '--algorithm',
+        nargs='+',
+        default=[],
+        type=str,
+        help='Indicates which algorithms to run'
     )
     parser.add_argument(
         '-o', '--output',
@@ -37,16 +39,6 @@ if __name__ == '__main__':
         level=logging.INFO,
         format=None
     )
-
-    # Check if the output directory already contains some files. If so,
-    # do not run the script unless `--force` has been specified.
-    if os.path.exists(args.output) and not args.force:
-        logging.error('''
-Output directory already exists. Refusing to continue unless `--force`
-is specified.
-        ''')
-
-        sys.exit(-1)
 
     logging.info('Loading graphs...')
 
@@ -69,8 +61,14 @@ is specified.
     }
 
     param_grid = {
-        'WL': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],  # $h$ = number of iterations
-        'GL': [3, 4, 5],                       # $k$ = size of graphlet
+        'WL': [0, 1, 2, 3, 4, 5, 6, 7],  # $h$ = number of iterations
+        'GL': [3, 4, 5],                 # $k$ = size of graphlet
+    }
+
+    # Remove algorithms that have not been specified by the user; this
+    # makes it possible to run only a subset of all configurations.
+    algorithms = {
+        k: v for k, v in algorithms.items() if k in args.algorithm
     }
 
     os.makedirs(args.output, exist_ok=True)
