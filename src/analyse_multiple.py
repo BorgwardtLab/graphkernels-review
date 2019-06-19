@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 #
-# analyse.py: analyses a given JSON result file and creates a simple
-# output table.
-
+# analyse_multiple.py: analyses multiple JSON result files and creates
+# a simple output table. In contrast to the other script, this one can
+# handle more than one JSON file.
 
 import argparse
 import collections
@@ -77,18 +77,9 @@ if __name__ == '__main__':
 
     df = None
 
-    # TODO:
-    #
-    #   1. Make this collation work for different files; each file
-    #      contains a single kernel--data combination.
-    #
-    #   2. Easiest things to do would be to modify the collation
-    #      function return to return the data set and the kernel
-    #      in order to to simplify post-processing.
-    #
-    #   3. Last, results are collated in a table, with the columns
-    #      updated correctly.
-
+    # We collate *all* of the files instead of using single one. This
+    # gives us more flexibility. In theory, this should also work for
+    # files in which multiple measurements are present.
     for filename in args.FILE:
         with open(filename) as f:
             data = json.load(f)
