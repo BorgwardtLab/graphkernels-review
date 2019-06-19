@@ -182,8 +182,8 @@ def train_and_test(train_indices, test_indices, matrices):
 
     # Prediction-based measures
     accuracy = accuracy_score(y_test, y_pred)
-    precision = precision_score(y_test, y_pred)
-    recall = recall_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred, average='macro')
+    recall = recall_score(y_test, y_pred, average='macro')
 
     # Score-based measures
     auroc = roc_auc_score(y_test, y_score[:, 1])
