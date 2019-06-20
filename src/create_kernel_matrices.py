@@ -29,6 +29,11 @@ if __name__ == '__main__':
         help='Indicates which algorithms to run'
     )
     parser.add_argument(
+        '-f', '--force', action='store_true',
+        default=False,
+        help='If specified, overwrites data'
+    )
+    parser.add_argument(
         '-o', '--output',
         required=True,
         type=str,
@@ -79,6 +84,15 @@ if __name__ == '__main__':
 
     for algorithm in sorted(tqdm(algorithms.keys(), desc='Algorithm')):
 
+        # Filename for the current algorithm. We create this beforehand
+        # in order to check whether we would overwrite something.
+        filename = os.path.join(args.output, f'{algorithm}.npz')
+
+        if os.path.exists(filename):
+            if not args.force:
+                logging.info('Output path already exists. Skipping.')
+                continue
+
         # Function to apply to the list of graphs in order to obtain
         # a kernel matrix.
         f = algorithms[algorithm]
@@ -103,11 +117,9 @@ its corresponding parameter grid.
             # the set of matrices.
             matrices['y'] = y
 
-            filename = os.path.join(args.output, f'{algorithm}.npz')
             np.savez(filename, **matrices)
 
         else:
             K = f(graphs)
 
-            filename = os.path.join(args.output, f'{algorithm}.npz')
             np.savez(filename, K=K, y=y)
