@@ -9,6 +9,7 @@ import collections
 import logging
 import json
 import os
+import sys
 import warnings
 
 import numpy as np
@@ -217,6 +218,11 @@ if __name__ == '__main__':
         help='Input kernel matrix'
     )
     parser.add_argument(
+        '-f', '--force', action='store_true',
+        default=False,
+        help='If specified, overwrites data'
+    )
+    parser.add_argument(
         '-n', '--name',
         type=str,
         help='Data set name',
@@ -235,6 +241,17 @@ if __name__ == '__main__':
         level=logging.INFO,
         format=None
     )
+
+    if os.path.exists(args.output):
+        if not args.force:
+            logging.info(
+'''
+Refusing to overwrite output file unless `-f` or `--force`
+has been specified.
+'''
+            )
+
+            sys.exit(0)
 
     logging.info('Loading input data...')
 
