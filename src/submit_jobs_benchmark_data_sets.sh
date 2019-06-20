@@ -12,6 +12,6 @@ KERNELS=(WL GL SP VH EH)
 
 for DATA_SET in "${DATA_SETS[@]}"; do
   for KERNEL in "${KERNELS[@]}"; do
-    bsub "run.sh ${DATA_SET} ${KERNEL}"
+    bsub "./run.sh ${DATA_SET} ${KERNEL}"
   done
 done
