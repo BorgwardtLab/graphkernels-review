@@ -12,6 +12,6 @@ KERNELS=(WL GL SP VH EH)
 
 for DATA_SET in "${DATA_SETS[@]}"; do
   for KERNEL in "${KERNELS[@]}"; do
-    bsub -R "rusage[mem=8000]" "./run.sh ${DATA_SET} ${KERNEL}"
+    bsub -W 23:59 -R "rusage[mem=32000]" "./run.sh ${DATA_SET} ${KERNEL}"
   done
 done
