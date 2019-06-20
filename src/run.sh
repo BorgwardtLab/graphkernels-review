@@ -16,5 +16,5 @@
 #   ALGORITHM: An abbreviation of one of the algorithms to run. One of
 #   these days, I will document all of them in the repo.
 
-python3 ../src/create_kernel_matrices.py -o ../matrices/$1 ../data/$1/*.pickle
+python3 ../src/create_kernel_matrices.py -a $2 -o ../matrices/$1 ../data/$1/*.pickle
 python3 ../src/train.py ../matrices/$1/$2.npz -n $1 -o ../results_run/$1_$2.json
