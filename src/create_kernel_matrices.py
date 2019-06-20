@@ -9,6 +9,7 @@ import argparse
 import logging
 import os
 import sys
+import traceback
 
 import graphkernels.kernels as gk
 import igraph as ig
@@ -94,6 +95,8 @@ if __name__ == '__main__':
 Caught exception for {algorithm}; continuing with the next algorithm and
 its corresponding parameter grid.
                 ''')
+
+                traceback.print_exc()
                 continue
 
             # Store the label vector of the graph data set along with
