@@ -95,12 +95,9 @@ if __name__ == '__main__':
         mean = df_local.mean(axis=1)
         std = df_local.std(axis=1)
 
-        df_local[name + '_mean'] = mean
-        df_local[name + '_std'] = std
-
-        # This could probably be solved more elegantly, but for now,
-        # let's just remove everything that is not a mean.
-        df_local = df_local[[name + '_mean', name + '_std']]
+        # Replace everything that is not a mean
+        df_local[name] = f'{mean.values[0]:2.2f} +- {std.values[0]:2.2f}'
+        df_local = df_local[[name]]
 
         if df is None:
             df = df_local
