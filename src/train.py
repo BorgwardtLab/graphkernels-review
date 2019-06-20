@@ -185,9 +185,14 @@ def train_and_test(train_indices, test_indices, matrices):
     precision = precision_score(y_test, y_pred, average='macro')
     recall = recall_score(y_test, y_pred, average='macro')
 
-    # Score-based measures
-    auroc = roc_auc_score(y_test, y_score[:, 1])
-    auprc = average_precision_score(y_test, y_score[:, 1])
+    # Score-based measures; in the multi-class setting, they are not
+    # available but we can simply ignore any errors.
+    try:
+        auroc = roc_auc_score(y_test, y_score[:, 1])
+        auprc = average_precision_score(y_test, y_score[:, 1])
+    except ValueError:
+        auroc = np.nan
+        auproc = np.nan
 
     results = {
         'best_model': best_parameters,
