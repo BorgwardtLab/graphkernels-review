@@ -9,11 +9,12 @@ import collections
 import logging
 import json
 import os
+import warnings
 
 import numpy as np
 
 from sklearn.base import clone
-from sklearn.svm import SVC
+from sklearn.exceptions import UndefinedMetricWarning
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import average_precision_score
 from sklearn.metrics import precision_score
@@ -23,6 +24,7 @@ from sklearn.metrics import make_scorer
 from sklearn.model_selection import ParameterGrid
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection._validation import _fit_and_score
+from sklearn.svm import SVC
 
 from tqdm import tqdm
 
@@ -247,6 +249,10 @@ if __name__ == '__main__':
 
     n_graphs = None
     y = None
+
+    # I am aware of the fact that not all metrics are defined for all
+    # data sets; there is no need to clutter up the output.
+    warnings.filterwarnings('ignore', category=UndefinedMetricWarning)
 
     # Check input data by looking at the shape of matrices and their
     # corresponding label vectors.
