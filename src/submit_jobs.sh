@@ -10,18 +10,18 @@ KERNELS=(WL GL SP VH EH)
 
 for DATA_SET in "${DATA_SETS[@]}"; do
   for KERNEL in "${KERNELS[@]}"; do
-    bsub -N -W 23:59 -R "rusage[mem=64000]" "./run.sh ${DATA_SET} ${KERNEL}"
+    bsub -W 23:59 -R "rusage[mem=64000]" "./run.sh ${DATA_SET} ${KERNEL}"
   done
 done
 
 # Handle large data sets by submitting them to an even longer queue
 # where they will hopefully be executed at some point.
 
-DATA_SETS_LARGE=(NCI1 NCI109) 
+LARGE_DATA_SETS=(NCI1 NCI109)
 
 for DATA_SET in "${LARGE_DATA_SETS[@]}"; do
   for KERNEL in "${KERNELS[@]}"; do
-    bsub -N -W 48:00 -R "rusage[mem=64000]" "./run.sh ${DATA_SET} ${KERNEL}"
+    bsub -W 48:00 -R "rusage[mem=64000]" "./run.sh ${DATA_SET} ${KERNEL}"
   done
 done
 
