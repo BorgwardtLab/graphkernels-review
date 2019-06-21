@@ -312,6 +312,8 @@ has been specified.
 
         for iteration in range(n_iterations):
 
+            logging.info(f'Iteration {iteration + 1}/{n_iterations}')
+
             # Every matrix, i.e. every kernel, gets the *same* folds so that
             # these results do not have to be stored multiple times. Yet, we
             # have to re-initialize this based on the iteration, for we want
@@ -324,6 +326,8 @@ has been specified.
 
             for fold_index, (train_index, test_index) in \
                     enumerate(cv.split(all_indices, y)):
+
+                logging.info(f'Processing fold {fold_index + 1}/{n_folds}...')
 
                 # These indices do *not* change for individual kernels,
                 # but we will overwrite them nonetheless.
@@ -384,7 +388,8 @@ has been specified.
                     key: value for key, value in fold_results.items()
                 }
 
-    # TODO: should ensure that nothing is overwritten here
+    # The check for overwriting this data is only done once. If we have
+    # arrived here, we might just as well write out our results.
     with open(args.output, 'w') as f:
         json.dump(
             all_results,
