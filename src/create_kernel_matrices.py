@@ -18,6 +18,33 @@ import numpy as np
 from tqdm import tqdm
 
 
+def preprocess(graph):
+    '''
+    Performs pre-processing on a graph in order for the `graphkernels`
+    package to work properly. At present, the following two steps will
+    be performed:
+
+    1. Deleting of edge labels and edge attributes
+    2. Creating a degree-based vertex label for unlabelled graphs
+
+    :param graph: Graph to operate on
+    :return: Copy of pre-processed graph
+    '''
+
+    # Remove all edge attributes (including labels)
+    for name in graph.es.attributes():
+        del graph.es[name]
+
+    # Check whether we need to create a vertex attribute
+    if 'label' not in graph.vs.attributes():
+
+        # This skips one step: we could also add a uniform label here
+        # but then WL will need an additional step to work as expected
+        graph.vs['label'] = graph.degree()
+
+    return graph
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('FILE', nargs='+', type=str, help='Input file(s)')
@@ -52,6 +79,10 @@ if __name__ == '__main__':
     graphs = [
         ig.read(filename, format='picklez') for filename in
         tqdm(args.FILE, desc='File')
+    ]
+
+    graphs = [
+        preprocess(graph) for graph in tqdm(graphs, desc='Preprocessing')
     ]
 
     y = np.array([g['label'] for g in graphs])
