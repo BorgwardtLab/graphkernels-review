@@ -37,7 +37,6 @@ def preprocess(graph):
 
     # Check whether we need to create a vertex attribute
     if 'label' not in graph.vs.attributes():
-
         # This skips one step: we could also add a uniform label here
         # but then WL will need an additional step to work as expected
         graph.vs['label'] = graph.degree()
