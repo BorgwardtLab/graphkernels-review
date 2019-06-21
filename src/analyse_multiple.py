@@ -81,6 +81,7 @@ if __name__ == '__main__':
     # gives us more flexibility. In theory, this should also work for
     # files in which multiple measurements are present.
     for filename in args.FILE:
+
         with open(filename) as f:
             data = json.load(f)
 
@@ -106,9 +107,8 @@ if __name__ == '__main__':
 
     print(
       tabulate.tabulate(
-        df,
+        df.transpose(),
         tablefmt='github',
-        floatfmt='2.2f',
         headers='keys',
       )
     )
