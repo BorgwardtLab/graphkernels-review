@@ -31,20 +31,15 @@ SAVE_PATH=../matrices/$1/MLG
 # TODO: make configurable?
 BIN="$HOME/Projects/MLGkernel/MLGkernel/runMLG"
 
-# Check if we can support jobs. This functionality is not used at the
-# moment.
-BSUB="bsub"
-if ![ -x "$(command -v bsub)" ]; then
-  BSUB=""
-fi
-
 for ETA in "${ETA_GAMMA_GRID[@]}"; do
   for GAMMA in "${ETA_GAMMA_GRID[@]}"; do
     for R in "${RADIUS_GRID[@]}"; do
       for L in "${LEVEL_GRID[@]}"; do
         JOB="MLG_${NAME}_${ETA}_${GAMMA}_${R}_${L}"
-        #bsub -J $JOB $BIN -d $DATA -f $FEATURES -s ${SAVE_PATH}_${ETA}_${GAMMA}_${R}_${L}.txt -e $ETA -g $GAMMA -r $R -l $L -t $NUM_THREADS -m $GROW
-        $BIN -d $DATA -f $FEATURES -s ${SAVE_PATH}_${ETA}_${GAMMA}_${R}_${L}.txt -e $ETA -g $GAMMA -r $R -l $L -t $NUM_THREADS -m $GROW
+  
+        # This job comes with a name; making it possible to create
+        # a proper waiting condition later on.
+        bsub -J $JOB $BIN -d $DATA -f $FEATURES -s ${SAVE_PATH}_${ETA}_${GAMMA}_${R}_${L}.txt -e $ETA -g $GAMMA -r $R -l $L -t $NUM_THREADS -m $GROW
       done
     done
   done
@@ -53,6 +48,4 @@ done
 # Wait until *all* jobs concerning that data set and the MLG kernel have
 # been completed (or failed) to finally execute the concatenation script
 # for all data sets.
-bsub -J "${NAME}_CAT" -w "ended(MLG_${NAME}*)" ls -alv
-
-# TODO: execute concatenation script...
+bsub -J "${NAME}_CAT" -w "ended(MLG_${NAME}*)" ./cat_matrices.py -l ../data/$1/$1_L.txt -o ../matrices/$1/MLG.npz ${SAVE_PATH}*.txt
