@@ -223,6 +223,11 @@ if __name__ == '__main__':
         help='If specified, overwrites data'
     )
     parser.add_argument(
+        '-i', '--with-indices', action='store_true',
+        default=False,
+        help='If specified, stores indices (LARGE!) in JSON file'
+    )
+    parser.add_argument(
         '-n', '--name',
         type=str,
         help='Data set name',
@@ -359,8 +364,11 @@ has been specified.
                 # already stored, but since all folds are the same, this
                 # is not a problem.
                 per_fold = all_results['iterations'][iteration]['folds']
-                per_fold[fold_index]['train_indices'] = train_indices.tolist()
-                per_fold[fold_index]['test_indices'] = test_indices.tolist()
+
+                if args.with_indices:
+                    per_fold[fold_index]['train_indices'] = train_indices.tolist()
+                    per_fold[fold_index]['test_indices'] = test_indices.tolist()
+
                 per_fold[fold_index]['y_test'] = y[test_indices].tolist()
 
                 # Prepare results for the current fold of the current
