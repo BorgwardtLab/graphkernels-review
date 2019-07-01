@@ -1,0 +1,21 @@
+#!/usr/bin/env zsh
+#
+# create_kernel_matrices: creates kernel matrices of some pre-selected
+# data sets. Eventually, this script should be updated to handle *all*
+# data sets.
+
+DATA_SETS=(
+  'AIDS'
+  'MUTAG'
+  'ENZYMES'
+  'PTC_FM'
+  'PTC_FR'
+  'PTC_MM'
+  'PTC_MR'
+)
+
+for data_set in $DATA_SETS; do
+  echo "Processing $data_set..."
+  ../src/create_kernel_matrices.py -o ../matrices/$data_set $data_set/*.pickle
+  echo
+done
