@@ -49,7 +49,7 @@ if __name__ == '__main__':
         '-l', '--labels',
         type=str,
         help='Labels file',
-        require=True
+        required=True
     )
 
     args = parser.parse_args()
