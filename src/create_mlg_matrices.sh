@@ -11,9 +11,11 @@
 #
 #   https://arxiv.org/pdf/1603.06186.pdf
 
-ETA_GAMMA_GRID=(0.01 0.1 1)
-RADIUS_GRID=(1 2 3 4)
-LEVEL_GRID=(1 2 3 4)
+# This is the 'reduced parameter grid', following the recommendations by
+# the authors.
+ETA_GAMMA_GRID=(0.01 0.1)
+RADIUS_GRID=(2 3)
+LEVEL_GRID=(2 3)
 
 # This is taken from the original `sample.sh` script from the GitHub
 # repository of the project.
