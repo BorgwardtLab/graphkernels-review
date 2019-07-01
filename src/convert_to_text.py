@@ -45,8 +45,6 @@ if __name__ == '__main__':
         tqdm(args.FILE, desc='File')
     ]
 
-    y = np.array([g['label'] for g in graphs])
-
     os.makedirs(args.output, exist_ok=True)
 
     name = os.path.basename(args.output)
@@ -75,3 +73,15 @@ if __name__ == '__main__':
             # itself, and store it.
             print(A.shape[0], file=f)
             np.savetxt(f, A, delimiter=' ', fmt='%d')
+
+            # Print number of node labels, followed by the label vector
+            # it self, and store it. First, we have to check whether an
+            # internal label exists. If not, we also use the degree.
+
+            if 'label' in graph.vs.attributes():
+                labels = np.array(graph.vs['label'])
+            else:
+                labels = np.array(graph.degree())
+
+            print(len(labels), file=g)
+            np.savetxt(g, labels, delimiter=' ', fmt='%d')
