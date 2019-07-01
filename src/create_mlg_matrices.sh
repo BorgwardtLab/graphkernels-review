@@ -35,8 +35,16 @@ for ETA in $ETA_GAMMA_GRID; do
   for GAMMA in $ETA_GAMMA_GRID; do
     for R in $RADIUS_GRID; do
       for L in $LEVEL_GRID; do
-        $BIN -d $DATA -f $FEATURES -s ${SAVE_PATH}_${ETA}_${GAMMA}_${R}_${L}.txt -e $ETA -g $GAMMA -r $R -l $L -t $NUM_THREADS -m $GROW
+        JOB="MLG_${NAME}_${ETA}_${GAMMA}_${R}_${L}"
+        #bsub -J $JOB $BIN -d $DATA -f $FEATURES -s ${SAVE_PATH}_${ETA}_${GAMMA}_${R}_${L}.txt -e $ETA -g $GAMMA -r $R -l $L -t $NUM_THREADS -m $GROW
+        bsub -J $JOB ls
       done
     done
   done
 done
+
+# Wait until *all* jobs concerning that data set and the MLG kernel have
+# been completed (or failed).
+bwait -w 'ended(MLG_${NAME}*)'
+
+# TODO: execute concatenation script...
