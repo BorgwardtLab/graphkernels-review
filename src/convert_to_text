@@ -7,6 +7,6 @@ DATA_SETS=(AIDS BZR BZR_MD COIL-DEL COIL-RAG COLLAB COX2 COX2_MD DBLP_v1 DD DHFR
 
 for DATA_SET in $DATA_SETS; do
 	echo "Processing $DATA_SET..."
-	../src/convert_to_text.py -o $DATA_SET $DATA_SET/
+	../src/convert_to_text.py -o ../data/$DATA_SET ../data/$DATA_SET/
 	echo
 done
