@@ -51,9 +51,12 @@ if __name__ == '__main__':
 
     name = os.path.basename(args.output)
     adjacency_name = os.path.join(args.output, name + '_A.txt')
-    labels_name = os.path.join(args.output, name + '_N.txt')
+    node_labels_name = os.path.join(args.output, name + '_N.txt')
+    graph_labels_name = os.path.join(args.output, name + '_L.txt')
 
-    if os.path.exists(adjacency_name) or os.path.exists(labels_name):
+    if os.path.exists(adjacency_name) or    \
+       os.path.exists(nodel_labels_name) or \
+       os.path.exists(graph_labels_name):
         if not args.force:
             logging.info('Output path already exists. Exiting.')
             sys.exit(0)
@@ -66,7 +69,11 @@ if __name__ == '__main__':
         tqdm(filenames, desc='File')
     ]
 
-    with open(adjacency_name, 'w') as f, open(labels_name, 'w') as g:
+    # Store node labels
+    y = np.array([g['label'] for g in graphs])
+    np.savetxt(graph_labels_name, y, delimiter=' ', fmt='%d')
+
+    with open(adjacency_name, 'w') as f, open(node_labels_name, 'w') as g:
 
         # Write header: number of graphs in total in the file
         print(len(graphs), file=f)
