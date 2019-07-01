@@ -5,6 +5,7 @@
 # This format is used by the MLG kernel.
 
 import argparse
+import glob
 import logging
 import os
 import sys
@@ -18,7 +19,7 @@ from tqdm import tqdm
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('FILE', nargs='+', type=str, help='Input file(s)')
+    parser.add_argument('DIRECTORY', type=str, help='Input directory')
     parser.add_argument(
         '-f', '--force', action='store_true',
         default=False,
@@ -40,10 +41,11 @@ if __name__ == '__main__':
 
     logging.info('Loading graphs...')
 
-    graphs = [
-        ig.read(filename, format='picklez') for filename in
-        tqdm(args.FILE, desc='File')
-    ]
+    # Get all filenames; this ensures that the shell does *not* complain
+    # about the length of the argument list.
+    filenames = sorted(
+        glob.glob(os.path.join(args.DIRECTORY, '*.pickle'))
+    )
 
     os.makedirs(args.output, exist_ok=True)
 
@@ -55,6 +57,14 @@ if __name__ == '__main__':
         if not args.force:
             logging.info('Output path already exists. Exiting.')
             sys.exit(0)
+
+    # Finally, load the graphs (notice that there is no need to load
+    # them if we would overwrite data anyway, so this ordering makes
+    # more sense).
+    graphs = [
+        ig.read(filename, format='picklez') for filename in
+        tqdm(filenames, desc='File')
+    ]
 
     with open(adjacency_name, 'w') as f, open(labels_name, 'w') as g:
 
