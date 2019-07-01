@@ -27,6 +27,10 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection._validation import _fit_and_score
 from sklearn.svm import SVC
 
+# This is guaranteed to produce the *best* results in terms of time
+# precision.
+from timeit import default_timer as timer
+
 from tqdm import tqdm
 
 
@@ -205,6 +209,7 @@ def train_and_test(train_indices, test_indices, matrices):
         'auroc': auroc,
         'auprc': auprc,
         'y_pred': y_pred.tolist(),
+        'y_score': y_score.tolist(),
     }
 
     return results
@@ -311,6 +316,9 @@ has been specified.
     all_results['name'] = args.name
     all_results['iterations'] = dict()
 
+    # Prepare time measurement
+    start_time = timer()
+
     for name, matrix in matrices.items():
 
         logging.info(f'Kernel name: {name}')
@@ -395,6 +403,8 @@ has been specified.
                 kernel_results[name] = {
                     key: value for key, value in fold_results.items()
                 }
+
+    all_results['runtime'] = timer() - start_time
 
     # The check for overwriting this data is only done once. If we have
     # arrived here, we might just as well write out our results.
