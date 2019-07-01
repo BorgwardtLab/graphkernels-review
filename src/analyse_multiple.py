@@ -9,9 +9,10 @@ import collections
 import json
 import tabulate
 
-
 import numpy as np
 import pandas as pd
+
+from tqdm import tqdm
 
 
 def collate_performance_measure(measure, data, aggregate='mean'):
@@ -80,7 +81,7 @@ if __name__ == '__main__':
     # We collate *all* of the files instead of using single one. This
     # gives us more flexibility. In theory, this should also work for
     # files in which multiple measurements are present.
-    for filename in args.FILE:
+    for filename in tqdm(args.FILE, desc='File'):
 
         with open(filename) as f:
             data = json.load(f)
