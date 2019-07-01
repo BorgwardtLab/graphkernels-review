@@ -45,6 +45,12 @@ if __name__ == '__main__':
         help='Output file',
         required=True,
     )
+    parser.add_argument(
+        '-l', '--labels',
+        type=str,
+        help='Labels file',
+        require=True
+    )
 
     args = parser.parse_args()
 
@@ -64,7 +70,12 @@ has been specified.
 
             sys.exit(0)
 
-    matrices = {}
+    # This array will be filled with the remaining matrices later on.
+    # Right now, we can only add the labels.
+    matrices = {
+        'y': np.loadtxt(args.labels)
+
+    }
 
     for filename in tqdm(args.FILES, desc='File'):
         parameters = get_parameters(filename)
