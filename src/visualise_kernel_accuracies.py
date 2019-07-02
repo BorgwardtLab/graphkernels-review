@@ -59,7 +59,13 @@ if __name__ == '__main__':
         # Prepare plots (this is just for show; we are actually more
         # interested in the output files).
         title = kwargs['metric']
+        axes[index].set_aspect('equal')
         axes[index].scatter(X[:, 0], X[:, 1])
         axes[index].set_title(title)
 
-    plt.tight_layout()
+        for j, text in enumerate(kernel_names):
+            x = X[j, 0]
+            y = X[j, 1]
+            axes[index].annotate(text, (x, y))
+
+    plt.show()
