@@ -139,8 +139,13 @@ if __name__ == '__main__':
       )
     )
 
+    # Stores original data frame containing the mean accuracy values as
+    # well as the standard deviations.
+    df.to_csv('../results/Accuracies_with_sdev.csv')
+
     # Store data frame containing nothing but the accuracies in order to
     # make it possible to *compare* graph kernels more meaningfully than
     # based on single tasks.
     df_vectorised = vectorise(df)
     df_vectorised.to_csv('../results/Accuracies.csv')
+
