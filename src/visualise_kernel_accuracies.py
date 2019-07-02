@@ -53,6 +53,7 @@ if __name__ == '__main__':
     metrics = [
         {'metric': 'minkowski', 'p': 1},  # $L_1$
         {'metric': 'minkowski', 'p': 2},  # $L_2$
+        {'metric': 'chebyshev'},
         {'metric': 'cityblock'}
     ]
 
@@ -77,10 +78,18 @@ if __name__ == '__main__':
         axes[index].set_aspect('equal')
         axes[index].scatter(Y[:, 0], Y[:, 1])
         axes[index].set_title(title)
+        axes[index].tick_params(
+            bottom=False, top=False,
+            left=False, right=False,
+            labelbottom=False, labeltop=False,
+            labelleft=False, labelright=False,
+        )
 
         for j, text in enumerate(kernel_names):
             x = Y[j, 0]
             y = Y[j, 1]
             axes[index].annotate(text, (x, y))
 
+
+    plt.tight_layout()
     plt.show()
