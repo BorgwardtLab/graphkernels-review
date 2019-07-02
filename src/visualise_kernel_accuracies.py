@@ -8,6 +8,10 @@
 
 import argparse
 
+from scipy.spatial.distance import pdist
+from scipy.spatial.distance import squareform
+
+
 import pandas as pd
 import numpy as np
 
@@ -19,7 +23,16 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     df = pd.read_csv(args.INPUT)
-    X = df.to_numpy()
+    X = df.iloc[:, 1:].to_numpy()
 
     kernel_names = df.iloc[:, 0].values
     data_set_names = df.iloc[0, :].values   # these are not required...
+
+    metrics = [
+        {'metric': 'euclidean'},          # $L_2$
+        {'metric': 'minkowski', 'p': 1},  # $L_1$
+        {'metric': 'correlation'}
+    ]
+
+    for kwargs in metrics:
+        D = squareform(pdist(X, **kwargs))
