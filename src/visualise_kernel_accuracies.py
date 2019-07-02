@@ -8,6 +8,7 @@
 import argparse
 
 from sklearn.manifold import MDS
+from sklearn.manifold import TSNE
 
 from scipy.spatial.distance import pdist
 from scipy.spatial.distance import squareform
@@ -50,27 +51,36 @@ if __name__ == '__main__':
     data_set_names = df.iloc[0, :].values   # these are not required...
 
     metrics = [
-        {'metric': 'euclidean'},          # $L_2$
         {'metric': 'minkowski', 'p': 1},  # $L_1$
-        {'metric': 'correlation'}
+        {'metric': 'minkowski', 'p': 2},  # $L_2$
+        {'metric': 'cityblock'}
     ]
 
-    fig, axes = plt.subplots(ncols=3, nrows=1, squeeze=True)
+    fig, axes = plt.subplots(
+        figsize=(16, 4),
+        ncols=len(metrics),
+        nrows=1,
+        squeeze=True
+    )
 
     for index, kwargs in enumerate(metrics):
         D = squareform(pdist(X, **kwargs))
-        X = embed_distance_matrix(D)
+        Y = embed_distance_matrix(D)
 
         # Prepare plots (this is just for show; we are actually more
         # interested in the output files).
         title = kwargs['metric']
+
+        if 'p' in kwargs:
+            title += '_' + str(kwargs['p'])
+
         axes[index].set_aspect('equal')
-        axes[index].scatter(X[:, 0], X[:, 1])
+        axes[index].scatter(Y[:, 0], Y[:, 1])
         axes[index].set_title(title)
 
         for j, text in enumerate(kernel_names):
-            x = X[j, 0]
-            y = X[j, 1]
+            x = Y[j, 0]
+            y = Y[j, 1]
             axes[index].annotate(text, (x, y))
 
     plt.show()
