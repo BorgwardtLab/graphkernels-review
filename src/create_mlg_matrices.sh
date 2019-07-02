@@ -36,10 +36,15 @@ for ETA in "${ETA_GAMMA_GRID[@]}"; do
     for R in "${RADIUS_GRID[@]}"; do
       for L in "${LEVEL_GRID[@]}"; do
         JOB="MLG_${NAME}_${ETA}_${GAMMA}_${R}_${L}"
-  
-        # This job comes with a name; making it possible to create
-        # a proper waiting condition later on.
-        bsub -J $JOB $BIN -d $DATA -f $FEATURES -s ${SAVE_PATH}_${ETA}_${GAMMA}_${R}_${L}.txt -e $ETA -g $GAMMA -r $R -l $L -t $NUM_THREADS -m $GROW
+        OUT="${SAVE_PATH}_${ETA}_${GAMMA}_${R}_${L}.txt"
+
+        if [ -f "$OUT" ]; then
+          echo "Skipping job creation for eta=$ETA, gamma=$GAMMA, radius=$R, level=$L because output already present."
+        else 
+          # This job comes with a name; making it possible to create
+          # a proper waiting condition later on.
+          bsub -J $JOB $BIN -d $DATA -f $FEATURES -s ${SAVE_PATH}_${ETA}_${GAMMA}_${R}_${L}.txt -e $ETA -g $GAMMA -r $R -l $L -t $NUM_THREADS -m $GROW
+        fi
       done
     done
   done
