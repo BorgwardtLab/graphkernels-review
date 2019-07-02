@@ -137,7 +137,9 @@ def resample_data_frame(df, n_samples):
         mean = float(mean)
         sdev = float(sdev)
 
-        return mean
+        # Replace the value in the cell by a value that is distributed
+        # according to the reported parameters.
+        return np.random.normal(mean, sdev)
 
     matrices = []
 
@@ -160,8 +162,12 @@ if __name__ == '__main__':
     # the data frame are mean accuracies with standard deviations.
     if 'object' in df.iloc[:, 1:].dtypes.values:
         # TODO: make configurable
-        n_samples = 10
+        n_samples = 1000
+
+        # Make this reproducible (hopefully!)
+        np.random.seed(42)
         feature_matrices = resample_data_frame(df, n_samples)
+
     else:
         feature_matrices = [df.iloc[:, 1:].to_numpy()]
 
@@ -213,7 +219,9 @@ if __name__ == '__main__':
             Y[:, 0],
             Y[:, 1],
             s,
-            ax=axes[index]
+            ax=axes[index],
+            c='k',
+            alpha=0.1
         )
 
         axes[index].set_title(title)
