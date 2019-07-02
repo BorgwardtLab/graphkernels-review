@@ -70,6 +70,31 @@ def collate_performance_measure(measure, data, aggregate='mean'):
     return results
 
 
+def vectorise(df):
+    '''
+    Vectorises a data frame containing accuracy values. Each *row* in
+    the resulting matrix will correspond to a given graph kernel, and
+    each *column* will correspond to a specific task, i.e. a data set
+    for classification.
+
+    This function performs some normalisation: NaNs are replaced by a
+    zero, which indicates failure on a task.
+
+    :param df: Input data frame
+    :return Data frame in `float` format, containing only kernels and
+    data sets.
+    '''
+
+    def get_accuracy(x):
+        tokens = str(x).split()
+        accuracy = tokens[0]
+        accuracy = accuracy.replace('nan', '0.0')
+
+        return float(accuracy)
+
+    return df.applymap(get_accuracy)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('FILE', nargs='+', help='Input file')
