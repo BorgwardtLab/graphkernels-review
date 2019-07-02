@@ -18,8 +18,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def circles(x, y, s, c='b', vmin=None, vmax=None, **kwargs):
-    """
+def circles(x, y, s, c='b', vmin=None, vmax=None, ax=None, **kwargs):
+    '''
     Make a scatter of circles plot of x vs y, where x and y are sequence
     like objects of the same lengths. The size of circles are in data scale.
 
@@ -59,7 +59,8 @@ def circles(x, y, s, c='b', vmin=None, vmax=None, **kwargs):
     --------
     This code is under [The BSD 3-Clause License]
     (http://opensource.org/licenses/BSD-3-Clause)
-    """
+    '''
+
     import numpy as np
     import matplotlib.pyplot as plt
     from matplotlib.patches import Circle
@@ -83,7 +84,9 @@ def circles(x, y, s, c='b', vmin=None, vmax=None, **kwargs):
         collection.set_array(np.asarray(c))
         collection.set_clim(vmin, vmax)
 
-    ax = plt.gca()
+    if not ax:
+        ax = plt.gca()
+
     ax.add_collection(collection)
     ax.autoscale_view()
     if c is not None:
@@ -157,7 +160,7 @@ if __name__ == '__main__':
     # the data frame are mean accuracies with standard deviations.
     if 'object' in df.iloc[:, 1:].dtypes.values:
         # TODO: make configurable
-        n_samples = 100
+        n_samples = 10
         feature_matrices = resample_data_frame(df, n_samples)
     else:
         feature_matrices = [df.iloc[:, 1:].to_numpy()]
@@ -194,6 +197,7 @@ if __name__ == '__main__':
 
         Y = np.mean(coordinate_matrices, axis=0)
         s = np.std(coordinate_matrices, axis=0)
+        s = np.amax(s, axis=1)
 
         # Prepare plots (this is just for show; we are actually more
         # interested in the output files).
@@ -203,7 +207,15 @@ if __name__ == '__main__':
             title += '_' + str(kwargs['p'])
 
         axes[index].set_aspect('equal')
-        axes[index].scatter(Y[:, 0], Y[:, 1])
+        axes[index].scatter(Y[:, 0], Y[:, 1], c='k')
+
+        circles(
+            Y[:, 0],
+            Y[:, 1],
+            s,
+            ax=axes[index]
+        )
+
         axes[index].set_title(title)
         axes[index].tick_params(
             bottom=False, top=False,
