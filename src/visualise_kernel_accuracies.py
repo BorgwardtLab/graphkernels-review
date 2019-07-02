@@ -8,11 +8,13 @@
 import argparse
 
 from sklearn.manifold import MDS
+
 from scipy.spatial.distance import pdist
 from scipy.spatial.distance import squareform
 
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def embed_distance_matrix(D):
@@ -48,8 +50,16 @@ if __name__ == '__main__':
         {'metric': 'correlation'}
     ]
 
-    fig, axes = plt.subplots(ncols=3, nrows=1)
+    fig, axes = plt.subplots(ncols=3, nrows=1, squeeze=True)
 
     for index, kwargs in enumerate(metrics):
         D = squareform(pdist(X, **kwargs))
+        X = embed_distance_matrix(D)
+
+        # Prepare plots (this is just for show; we are actually more
+        # interested in the output files).
         title = kwargs['metric']
+        axes[index].scatter(X[:, 0], X[:, 1])
+        axes[index].set_title(title)
+
+    plt.tight_layout()
