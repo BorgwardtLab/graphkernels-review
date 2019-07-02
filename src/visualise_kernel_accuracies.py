@@ -5,15 +5,29 @@
 # variants will be provided by this script (based on different metrics
 # or dissimilarity measures).
 
-
 import argparse
 
+from sklearn.manifold import MDS
 from scipy.spatial.distance import pdist
 from scipy.spatial.distance import squareform
 
-
 import pandas as pd
 import numpy as np
+
+
+def embed_distance_matrix(D):
+    '''
+    Embeds a distance matrix into 2D space for visualisation and
+    subsequent analysis.
+
+    :param D: Distance matrix
+
+    :return: Coordinate matrix. Indexing follows the indexing of
+    the original matrix; no reshuffling is done.
+    '''
+
+    embedding = MDS(metric=True, dissimilarity='precomputed')
+    return embedding.fit_transform(D)
 
 
 if __name__ == '__main__':
@@ -34,5 +48,8 @@ if __name__ == '__main__':
         {'metric': 'correlation'}
     ]
 
-    for kwargs in metrics:
+    fig, axes = plt.subplots(ncols=3, nrows=1)
+
+    for index, kwargs in enumerate(metrics):
         D = squareform(pdist(X, **kwargs))
+        title = kwargs['metric']
