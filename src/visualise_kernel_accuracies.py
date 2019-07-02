@@ -162,7 +162,7 @@ if __name__ == '__main__':
     # the data frame are mean accuracies with standard deviations.
     if 'object' in df.iloc[:, 1:].dtypes.values:
         # TODO: make configurable
-        n_samples = 1000
+        n_samples = 250
 
         # Make this reproducible (hopefully!)
         np.random.seed(42)
@@ -214,6 +214,14 @@ if __name__ == '__main__':
 
         axes[index].set_aspect('equal')
         axes[index].scatter(Y[:, 0], Y[:, 1], c='k')
+
+        for M in coordinate_matrices:
+            axes[index].scatter(M[:, 0], M[:, 1], c='k')
+
+            for j, text in enumerate(kernel_names):
+                x = M[j, 0]
+                y = M[j, 1]
+                axes[index].annotate(text, (x, y))
 
         circles(
             Y[:, 0],
