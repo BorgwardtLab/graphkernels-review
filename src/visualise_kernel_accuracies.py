@@ -38,6 +38,40 @@ def embed_distance_matrix(D):
     return embedding.fit_transform(D)
 
 
+def resample_data_frame(df, n_samples):
+    '''
+    Given a data frame whose cells contain a mean and a standard
+    deviation, performs `n_samples` sampling operations, storing
+    the resulting matrices in a list.
+    '''
+
+    def sample(x):
+        '''
+        Takes a cell of the data frame, converts it into the
+        corresponding representation of mean/sdev, and draws
+        a random sample from the corresponding distribution.
+        '''
+
+        # Short-circuit sampling procedure if there's nothing to sample
+        if type(x) != str and np.isnan(x):
+            return 0.0
+
+        mean, _, sdev = str(x).split()
+
+        mean = float(mean)
+        sdev = float(sdev)
+
+        return mean
+
+    matrices = []
+
+    for i in range(n_samples):
+        df_ = df.iloc[:, 1:].applymap(sample)
+        matrices.append(df_.iloc[:, 1:].to_numpy())
+
+    return matrices
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('INPUT', type=str, help='Input file')
@@ -50,8 +84,8 @@ if __name__ == '__main__':
     # the data frame are mean accuracies with standard deviations.
     if 'object' in df.iloc[:, 1:].dtypes.values:
         # TODO: make configurable
-        n_samples = 1000
-        feature_matrices = resample_data_frame(df)
+        n_samples = 100
+        feature_matrices = resample_data_frame(df, n_samples)
     else:
         feature_matrices = [df.iloc[:, 1:].to_numpy()]
 
