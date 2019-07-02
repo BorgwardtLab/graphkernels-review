@@ -28,7 +28,12 @@ def embed_distance_matrix(D):
     the original matrix; no reshuffling is done.
     '''
 
-    embedding = MDS(metric=True, dissimilarity='precomputed')
+    embedding = MDS(
+        metric=True,
+        dissimilarity='precomputed',
+        random_state=42
+    )
+
     return embedding.fit_transform(D)
 
 
