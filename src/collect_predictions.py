@@ -77,6 +77,13 @@ if __name__ == '__main__':
     # data set.
     all_predictions = collections.defaultdict(dict)
 
+    # Stores all data set names and all kernel names, respectively.
+    # Moreover, stores the number of predictions for a data set. We
+    # assume that *if* a kernel runs, it makes predictions for each
+    # sample in the data set.
+    data_set_to_size = dict()
+    kernel_names = set()
+
     # We collate *all* of the files instead of using single one. This
     # gives us more flexibility. In theory, this should also work for
     # files in which multiple measurements are present.
@@ -94,6 +101,19 @@ if __name__ == '__main__':
         # sure that no re-ordering happens.
         for kernel, values in sorted(predictions.items()):
             all_predictions[kernel][name] = values
+
+            # Data set has been seen; ensure that the size is correct
+            if name in data_set_to_size:
+                assert len(values) == data_set_to_size[name]
+            else:
+                data_set_to_size[name] = len(values)
+
+            # Store kernel name so that we can unroll everything
+            kernel_names.add(kernel)
+
+    # Unroll the prediction scores and create a new matrix that can be
+    # stored. First, we need to collect all data set, though; it *may*
+    # be possible that we have missing values for some data sets.
 
     # Stores original data frame containing the mean accuracy values as
     # well as the standard deviations.
