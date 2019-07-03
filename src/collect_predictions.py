@@ -43,7 +43,7 @@ def concatenate_predictions(prediction, data):
 
         results_per_fold = collections.defaultdict(list)
 
-        for fold in data_per_iteration['folds']:
+        for fold in sorted(data_per_iteration['folds']):
             data_per_fold = data_per_iteration['folds'][fold]
 
             # Store the desired measure per kernel and per fold; the
