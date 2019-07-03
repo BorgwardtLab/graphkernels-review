@@ -146,6 +146,11 @@ if __name__ == '__main__':
             # Store kernel name so that we can unroll everything
             kernel_names.add(kernel)
 
+        # Use this to indicate the original labels
+        if 'XX' not in all_predictions:
+            all_predictions['XX'][name] = labels
+            kernel_names.add('XX')
+
     # Unroll the prediction scores and create a new matrix that can be
     # stored. First, we need to collect all data set, though; it *may*
     # be possible that we have missing values for some data sets.
