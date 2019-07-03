@@ -64,9 +64,6 @@ def concatenate_predictions(prediction, data):
         k: list(itertools.chain(*v)) for k, v in sorted(results.items())
     }
 
-    for kernel in results:
-        print(len(results[kernel]))
-
     return results
 
 
