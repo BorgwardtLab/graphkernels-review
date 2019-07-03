@@ -8,10 +8,8 @@ import argparse
 import collections
 import itertools
 import json
-import tabulate
 
 import numpy as np
-import pandas as pd
 
 from tqdm import tqdm
 
@@ -73,7 +71,11 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    df = None
+    # Stores the *complete* data set, i.e. all predictions from all
+    # kernels. The first level is a kernel, while the second level,
+    # i.e. the values of the first level, contain predictions *per*
+    # data set.
+    all_predictions = collections.defaultdict(dict)
 
     # We collate *all* of the files instead of using single one. This
     # gives us more flexibility. In theory, this should also work for
@@ -88,28 +90,10 @@ if __name__ == '__main__':
         name = data['name']
         predictions = concatenate_predictions('y_pred', data)
 
-        #df_local = pd.DataFrame.from_dict(accuracies, orient='index')
-        #df_local = df_local * 100
-
-        #mean = df_local.mean(axis=1)
-        #std = df_local.std(axis=1)
-
-        ## Replace everything that is not a mean
-        #df_local[name] = f'{mean.values[0]:2.2f} +- {std.values[0]:2.2f}'
-        #df_local = df_local[[name]]
-
-        #if df is None:
-        #    df = df_local
-        #else:
-        #    df = df.combine_first(df_local)
-
-    print(
-      tabulate.tabulate(
-        df.transpose(),
-        tablefmt='github',
-        headers='keys',
-      )
-    )
+        # Insert values into the global data dictionary, while making
+        # sure that no re-ordering happens.
+        for kernel, values in sorted(predictions.items()):
+            all_predictions[kernel][name] = values
 
     # Stores original data frame containing the mean accuracy values as
     # well as the standard deviations.
