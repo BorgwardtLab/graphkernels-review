@@ -10,6 +10,7 @@ import itertools
 import json
 
 import numpy as np
+import pandas as pd
 
 from tqdm import tqdm
 
@@ -115,6 +116,46 @@ if __name__ == '__main__':
     # stored. First, we need to collect all data set, though; it *may*
     # be possible that we have missing values for some data sets.
 
-    # Stores original data frame containing the mean accuracy values as
-    # well as the standard deviations.
-    #df.to_csv('../results/Accuracies_with_sdev.csv')
+    n_rows = len(kernel_names)
+    n_cols = sum([v for k, v in data_set_to_size.items()])
+
+    X = np.zeros((n_rows, n_cols))
+
+    # Kernels go into the rows, predictions go into the columns and are
+    # unrolled as *one* big list.
+    for row_index, kernel in enumerate(sorted(all_predictions.keys())):
+
+        # Stores columns, indexed by data sets.
+        columns = {}
+
+        # Fill the column vector with NaNs. This ensures that everything
+        # can be calculated correctly even if no predictions are present
+        # for one of the kernels.
+        for data_set, size in sorted(data_set_to_size.items()):
+            x = np.empty((1, size))
+            x[:] = np.nan
+
+            columns[data_set] = x
+
+        for data_set, values in sorted(all_predictions[kernel].items()):
+
+            # Check that we are not doing something stupid with the
+            # predictions
+            assert len(values) == columns[data_set].shape[1]
+            columns[data_set][0, :] = values
+
+        x = np.concatenate([v for k, v in sorted(columns.items())],
+                axis=1)
+
+        X[row_index, :] = x
+
+    # That's the professional way ;)
+    X[np.isnan(X)] = -9999
+    X = X.astype(np.int)
+
+    np.savetxt(
+        '../results/Predictions_raw.csv',
+        X,
+        delimiter=',',
+        fmt='%d'
+    )
