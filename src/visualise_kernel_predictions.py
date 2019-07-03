@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
     # FIXME: they should be part of the respective file; the current
     # script cannot do this.
-    kernel_names = ['EH', 'GL', 'MLG', 'SP', 'VH', 'WL', 'WLOA']
+    kernel_names = ['EH', 'GL', 'MLG', 'SP', 'VH', 'WL', 'WLOA', 'XX']
 
     D = squareform(pdist(X, metric='hamming'))
     Y = embed_distance_matrix(D)
