@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    X = np.loadtxt(args.INPUT)
+    X = np.loadtxt(args.INPUT, delimiter=',')
 
     # FIXME: they should be part of the respective file; the current
     # script cannot do this.
