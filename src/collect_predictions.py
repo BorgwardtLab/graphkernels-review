@@ -66,6 +66,39 @@ def concatenate_predictions(prediction, data):
     return results
 
 
+def concatenate_labels(label, data):
+    '''
+    Concatenates the labels of a classifier on a given data set and
+    returns them, following original fold order.
+
+    :param label: Name of the label to extract.
+
+    :param data: Nested dictionary of which to extract data. The
+    function will throw an error if the required keys do not exist.
+
+    :return: A list of all labels per folds encountered for the given
+    data set. The list follows the original ordering of folds.
+    '''
+
+    results = []
+
+    # Need to ensure that we iterate in a sorted manner over this data
+    # frame because the order *needs* to be the same for each data set
+    # that we encounter.
+    for iteration in sorted(data['iterations']):
+        data_per_iteration = data['iterations'][iteration]
+
+        results_per_fold = collections.defaultdict(list)
+
+        for fold in sorted(data_per_iteration['folds']):
+            data_per_fold = data_per_iteration['folds'][fold]
+            labels = data_per_fold[label]
+
+            results.extend(labels)
+
+    return results
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('FILE', nargs='+', help='Input file')
@@ -97,6 +130,7 @@ if __name__ == '__main__':
 
         name = data['name']
         predictions = concatenate_predictions('y_pred', data)
+        labels = concatenate_labels('y_test', data)
 
         # Insert values into the global data dictionary, while making
         # sure that no re-ordering happens.
