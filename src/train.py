@@ -148,7 +148,7 @@ def grid_search_cv(
     return clf, kernel_matrices[best_parameters['K']], best_parameters
 
 
-def train_and_test(train_indices, test_indices, matrices):
+def train_and_test(train_indices, test_indices, matrices, max_iterations):
     '''
     Trains the classifier on a set of kernel matrices (that are all
     assumed to come from the same algorithm). This uses pre-defined
@@ -157,6 +157,7 @@ def train_and_test(train_indices, test_indices, matrices):
     :param train_indices: Indices to be used for training
     :param test_indices: Indices to be used for testing
     :param matrices: Kernel matrices belonging to some algorithm
+    :param max_iterations: Maximum number of iterations for SVM
 
     :return: Dictionary containing information about the training
     process and the trained model.
@@ -243,6 +244,12 @@ if __name__ == '__main__':
         type=str,
         help='Output file',
         required=True,
+    )
+    parser.add_argument(
+        '-I', '--max-iterations',
+        type=int,
+        help='Maximum number of iterations to use for training',
+        default=1e5
     )
 
     args = parser.parse_args()
@@ -352,7 +359,8 @@ has been specified.
                 results = train_and_test(
                     train_indices,
                     test_indices,
-                    matrix
+                    matrix,
+                    args.max_iterations
                 )
 
                 # We already have information about the folds for this
@@ -405,6 +413,7 @@ has been specified.
                 }
 
     all_results['runtime'] = timer() - start_time
+    all_results['max_iterations'] = args.max_iterations
 
     # The check for overwriting this data is only done once. If we have
     # arrived here, we might just as well write out our results.
