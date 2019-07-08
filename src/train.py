@@ -259,6 +259,8 @@ if __name__ == '__main__':
         format=None
     )
 
+    logging.info(f'Using at most {args.max_iterations} iterations')
+
     if os.path.exists(args.output):
         if not args.force:
             logging.info(
