@@ -22,7 +22,7 @@ LARGE_DATA_SETS=(COIL-DEL COIL-RAG COLLAB FRANKENSTEIN NCI1 NCI109 REDDIT-MULTI-
 
 for DATA_SET in "${LARGE_DATA_SETS[@]}"; do
   for KERNEL in "${KERNELS[@]}"; do
-    bsub -W 119:59 -R "rusage[mem=64000]" "./run.sh ${DATA_SET} ${KERNEL} 10000"
+    bsub -W 119:59 -R "rusage[mem=64000]" "./run.sh ${DATA_SET} ${KERNEL} 1000"
   done
 done
 
