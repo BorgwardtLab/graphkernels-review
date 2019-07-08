@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # run.sh: basic job running script for clusters with LSF support. Given
 # a data set name and an algorithm, will create a kernel matrix, and do
@@ -22,9 +22,8 @@
 
 python3 ../src/create_kernel_matrices.py -a $2 -o ../matrices/$1 ../data/$1/*.pickle
 
-if [ "$3" ]; then
-    python3 ../src/train.py ../matrices/$1/$2.npz -n $1 -o ../results/$1_$2.json
-  else
+if [ -n "$3" ]; then
+  python3 ../src/train.py ../matrices/$1/$2.npz -n $1 -o ../results/$1_$2.json
+else
     python3 ../src/train.py ../matrices/$1/$2.npz -n $1 -o ../results/$1_$2.json -I $3
 fi
-
