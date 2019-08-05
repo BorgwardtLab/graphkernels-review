@@ -36,6 +36,11 @@ def get_statistics(graphs):
     n_nodes = [len(g.vs) for g in graphs]
     n_edges = [len(g.es) for g in graphs]
 
+    V = np.mean(n_nodes)
+    E = np.mean(n_edges)
+
+    avg_density = 2 * E  / (V * (V - 1)) 
+
     has_node_labels = ['label' in g.vs.attributes() for g in graphs]
     has_edge_labels = ['label' in g.es.attributes() for g in graphs]
 
@@ -70,6 +75,7 @@ def get_statistics(graphs):
         'n_classes': n_classes,
         'avg_n_nodes': f'{np.mean(n_nodes):.2f}',
         'avg_n_edges': f'{np.mean(n_edges):.2f}',
+        'avg_density': f'{avg_density:.2f}',
         'has_node_labels': np.all(has_node_labels),
         'has_edge_labels': np.all(has_edge_labels),
         'dim_node_attributes': dim_node_attributes,
