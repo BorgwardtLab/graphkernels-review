@@ -39,7 +39,7 @@ def get_statistics(graphs, name):
     n_edges = [len(g.es) for g in graphs]
 
     avg_density = np.mean(
-        2 * E  / (V * (V - 1)) for E, V in zip(n_nodes, n_edges)
+        [2 * E  / max(V * (V - 1), 1) for V, E in zip(n_nodes, n_edges)]
     )
 
     has_node_labels = ['label' in g.vs.attributes() for g in graphs]
