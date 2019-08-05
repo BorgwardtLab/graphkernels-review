@@ -120,9 +120,6 @@ if __name__ == '__main__':
             name = directory
             rows.append(get_statistics(graphs, name))
 
-            # FIXME: Handle more than one data set :)
-            break
-
         break
 
     df = pd.DataFrame(rows)
