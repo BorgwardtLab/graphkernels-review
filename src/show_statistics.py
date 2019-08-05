@@ -63,14 +63,21 @@ def get_statistics(graphs, name):
         dim_node_attributes = int(dim_node_attributes)
 
     if np.all(has_edge_attributes):
-        dim_edge_attributes = np.mean(
-            [len(g.es['attribute'][0]) for g in graphs]
-        )
+        for g  in graphs:
+            try:
+                dim_edge_attributes = np.mean(
+                    [len(g.es['attribute'][0]) for g in graphs]
+                )
 
-        # If edge attributes exist, their dimensionality *must* be an
-        # integer.
-        assert dim_edge_attributes.is_integer()
-        dim_edge_attributes = int(dim_edge_attributes)
+                # If edge attributes exist, their dimensionality *must* be an
+                # integer.
+                assert dim_edge_attributes.is_integer()
+                dim_edge_attributes = int(dim_edge_attributes)
+
+            except:
+                # FIXME: this is not super smart, but an easy way out for
+                # now
+                dim_edge_attributes = None
 
     return {
         'name': name,
@@ -111,13 +118,14 @@ if __name__ == '__main__':
                 os.path.join(root, directory, '*.pickle'))
             )
 
-            graphs = [
-                ig.read(filename, format='picklez') for filename in
-                tqdm(files, desc='File')
-            ]
-
             # Use the directory name as the data set name
             name = directory
+
+            graphs = [
+                ig.read(filename, format='picklez') for filename in
+                tqdm(files, desc=name)
+            ]
+
             rows.append(get_statistics(graphs, name))
 
         break
