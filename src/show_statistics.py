@@ -46,16 +46,17 @@ def get_statistics(graphs):
     has_edge_attributes = ['attribute' in g.es.attributes() for g in graphs]
 
     if np.all(has_node_attributes):
-
-        for g in graphs:
-            print(g.vs['attribute'])
-        dim_node_attributes = np.mean(
-            [len(g.vs['attribute']) for g in graphs]
+        dim_node_attributes = int(
+            np.mean(
+                [len(g.vs['attribute'][0]) for g in graphs]
+            )
         )
 
     if np.all(has_edge_attributes):
-        dim_edge_attributes = np.mean(
-            [len(g.es['attribute']) for g in graphs]
+        dim_edge_attributes = int(
+            np.mean(
+                [len(g.es['attribute'][0]) for g in graphs]
+            )
         )
 
     return {
