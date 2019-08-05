@@ -13,6 +13,7 @@ import argparse
 import logging
 import glob
 import os
+import tabulate
 
 import igraph as ig
 import numpy as np
@@ -125,4 +126,12 @@ if __name__ == '__main__':
         break
 
     df = pd.DataFrame(rows)
-    print(df)
+    df = df.set_index('name')
+
+    print(
+        tabulate.tabulate(
+            df,
+            tablefmt='latex_booktabs',
+            headers='keys',
+        )
+    )
