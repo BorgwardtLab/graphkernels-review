@@ -21,12 +21,13 @@ import pandas as pd
 from tqdm import tqdm
 
 
-def get_statistics(graphs):
+def get_statistics(graphs, name):
     '''
     Calculates statistics for a given data set of graphs and returns a
     `dict` data structure for further processing.
 
     :param graphs: Graph data set
+    :param name: Data set name
     '''
 
     n_graphs = len(graphs)
@@ -71,6 +72,7 @@ def get_statistics(graphs):
         dim_edge_attributes = int(dim_edge_attributes)
 
     return {
+        'name': name,
         'n_graphs': n_graphs,
         'n_classes': n_classes,
         'avg_n_nodes': f'{np.mean(n_nodes):.2f}',
@@ -115,11 +117,12 @@ if __name__ == '__main__':
 
             # Use the directory name as the data set name
             name = directory
-            rows.append({name: get_statistics(graphs)})
+            rows.append(get_statistics(graphs, name))
 
             # FIXME: Handle more than one data set :)
             break
 
         break
 
-    print(rows)
+    df = pd.DataFrame(rows)
+    print(df)
