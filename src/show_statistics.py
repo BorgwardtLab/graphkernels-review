@@ -53,14 +53,20 @@ def get_statistics(graphs, name):
     has_edge_attributes = ['attribute' in g.es.attributes() for g in graphs]
 
     if np.all(has_node_attributes):
-        dim_node_attributes = np.mean(
-            [len(g.vs['attribute'][0]) for g in graphs]
-        )
+        try:
+            dim_node_attributes = np.mean(
+                [len(g.vs['attribute'][0]) for g in graphs]
+            )
 
-        # If node attributes exist, their dimensionality *must* be an
-        # integer.
-        assert dim_node_attributes.is_integer()
-        dim_node_attributes = int(dim_node_attributes)
+            # If node attributes exist, their dimensionality *must* be an
+            # integer.
+            assert dim_node_attributes.is_integer()
+            dim_node_attributes = int(dim_node_attributes)
+
+        except:
+            # FIXME: this is not super smart, but an easy way out for
+            # now
+            dim_node_attributes = None
 
     if np.all(has_edge_attributes):
         for g  in graphs:
