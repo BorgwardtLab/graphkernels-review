@@ -141,7 +141,7 @@ if __name__ == '__main__':
     print(
         tabulate.tabulate(
             df,
-            tablefmt='latex_booktabs',
+            tablefmt='plain',
             headers='keys',
         )
     )
