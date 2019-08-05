@@ -145,3 +145,5 @@ if __name__ == '__main__':
             headers='keys',
         )
     )
+
+    df.to_csv('/tmp/summary_statistics.csv')
