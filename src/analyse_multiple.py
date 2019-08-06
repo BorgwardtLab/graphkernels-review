@@ -139,6 +139,14 @@ if __name__ == '__main__':
       )
     )
 
+    print(
+      tabulate.tabulate(
+        df.transpose(),
+        tablefmt='plain',
+        headers='keys',
+      )
+    )
+
     # Stores original data frame containing the mean accuracy values as
     # well as the standard deviations.
     df.to_csv('../results/Accuracies_with_sdev.csv')
