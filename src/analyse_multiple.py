@@ -81,7 +81,7 @@ def vectorise(df):
     zero, which indicates failure on a task.
 
     :param df: Input data frame
-    :return Data frame in `float` format, containing only kernels and
+    :return: Data frame in `float` format, containing only kernels and
     data sets.
     '''
 
@@ -93,6 +93,26 @@ def vectorise(df):
         return float(accuracy)
 
     return df.applymap(get_accuracy)
+
+
+def format_cell(x):
+    '''
+    Formats a cell for easier inclusion in a printed table.
+
+    :param x: cell
+    :return: Formatted cell; depending on the input, LaTeX characters
+    will be added.
+    '''
+
+    # Replace underscores in any case in order to make it easier to
+    # include the table somewhere.
+    x = x.replace('_', '\\_')
+
+    if '+-' in x:
+        x = '\\num{' + x + '}'
+        x = x.replace('+-', '\\pm')
+
+    return x
 
 
 if __name__ == '__main__':
@@ -139,14 +159,6 @@ if __name__ == '__main__':
       )
     )
 
-    print(
-      tabulate.tabulate(
-        df.transpose(),
-        tablefmt='plain',
-        headers='keys',
-      )
-    )
-
     # Stores original data frame containing the mean accuracy values as
     # well as the standard deviations.
     df.to_csv('../results/Accuracies_with_sdev.csv')
@@ -157,3 +169,12 @@ if __name__ == '__main__':
     df_vectorised = vectorise(df)
     df_vectorised.to_csv('../results/Accuracies.csv')
 
+    df = df.applymap(format_cell)
+
+    print(
+      tabulate.tabulate(
+        df.transpose(),
+        tablefmt='plain',
+        headers='keys',
+      )
+    )
