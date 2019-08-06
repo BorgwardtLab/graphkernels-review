@@ -104,12 +104,14 @@ def format_cell(x):
     will be added.
     '''
 
+    if type(x) is float:
+        return x
+
     # Replace underscores in any case in order to make it easier to
     # include the table somewhere.
     x = x.replace('_', '\\_')
 
     if '+-' in x:
-        x = '\\num{' + x + '}'
         x = x.replace('+-', '\\pm')
 
     return x
