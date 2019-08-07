@@ -161,9 +161,15 @@ if __name__ == '__main__':
 
     X = np.zeros((n_rows, n_cols))
 
+    # Will contain the row and column labels of the kernels that are
+    # used to generate the matrix of predictions.
+    names = []
+
     # Kernels go into the rows, predictions go into the columns and are
     # unrolled as *one* big list.
     for row_index, kernel in enumerate(sorted(all_predictions.keys())):
+
+        names.append(kernel)
 
         # Stores columns, indexed by data sets.
         columns = {}
@@ -192,6 +198,9 @@ if __name__ == '__main__':
     # That's the professional way ;)
     X[np.isnan(X)] = -9999
     X = X.astype(np.int)
+
+    df = pd.DataFrame(X, index=names)
+    df.to_csv('../results/Predictions.csv')
 
     np.savetxt(
         '../results/Predictions_raw.csv',
