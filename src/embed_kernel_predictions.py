@@ -58,4 +58,6 @@ if __name__ == '__main__':
     Y = embed_distance_matrix(D)
 
     for name, coordinate in zip(kernel_names, Y):
-        print(name, coordinate)
+        x = coordinate[0]
+        y = coordinate[1]
+        print(f'{x:2.2f}', f'{y:2.2f}', name)
