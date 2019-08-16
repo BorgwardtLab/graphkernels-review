@@ -11,10 +11,10 @@ numpy = "*"
 tqdm = "*"
 scikit-learn = "*"
 scipy = "*"
-pandas = "*"
 tabulate = "*"
 matplotlib = "*"
 networkx = "*"
+pandas = "==0.24.2"
 
 [scripts]
 install_graphkernels_package = "pip install graphkernels"
