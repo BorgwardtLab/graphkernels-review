@@ -5,5 +5,5 @@ if [ -z ${DATA_SETS+x} ]; then
 fi
 
 for DATA_SET in "${DATA_SETS[@]}"; do
-  ./create_mp_matrices.sh ${DATA_SET}
+  ./create_mp_matrix.sh ${DATA_SET}
 done
