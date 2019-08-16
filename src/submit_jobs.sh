@@ -11,7 +11,7 @@ fi
 
 for DATA_SET in "${DATA_SETS[@]}"; do
   for KERNEL in "${KERNELS[@]}"; do
-    bsub -W 23:59 -R "rusage[mem=64000]" "./run.sh ${DATA_SET} ${KERNEL}"
+    bsub $MAIL -W 23:59 -R "rusage[mem=64000]" "./run.sh ${DATA_SET} ${KERNEL}"
   done
 done
 
@@ -22,7 +22,7 @@ LARGE_DATA_SETS=(COIL-DEL COIL-RAG COLLAB FRANKENSTEIN NCI1 NCI109 REDDIT-MULTI-
 
 for DATA_SET in "${LARGE_DATA_SETS[@]}"; do
   for KERNEL in "${KERNELS[@]}"; do
-    bsub -W 119:59 -R "rusage[mem=64000]" "./run.sh ${DATA_SET} ${KERNEL} 1000"
+    bsub $MAIL -W 119:59 -R "rusage[mem=64000]" "./run.sh ${DATA_SET} ${KERNEL} 1000"
   done
 done
 
