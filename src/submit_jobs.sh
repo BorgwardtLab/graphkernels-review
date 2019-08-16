@@ -11,7 +11,14 @@ fi
 
 for DATA_SET in "${DATA_SETS[@]}"; do
   for KERNEL in "${KERNELS[@]}"; do
-    bsub $MAIL -W 23:59 -R "rusage[mem=64000]" "./run.sh ${DATA_SET} ${KERNEL}"
+
+    # The SP kernel requires more memory...
+    MEMORY=64000
+    if [ ${KERNEL} = "SP" ]; then
+      MEMORY=128000
+    fi
+
+    bsub $MAIL -W 23:59 -R "rusage[mem=${MEMORY}]" "./run.sh ${DATA_SET} ${KERNEL}"
   done
 done
 
@@ -22,7 +29,14 @@ LARGE_DATA_SETS=(COIL-DEL COIL-RAG COLLAB FRANKENSTEIN NCI1 NCI109 REDDIT-MULTI-
 
 for DATA_SET in "${LARGE_DATA_SETS[@]}"; do
   for KERNEL in "${KERNELS[@]}"; do
-    bsub $MAIL -W 119:59 -R "rusage[mem=64000]" "./run.sh ${DATA_SET} ${KERNEL} 1000"
+
+    # The SP kernel requires more memory...
+    MEMORY=64000
+    if [ ${KERNEL} = "SP" ]; then
+      MEMORY=128000
+    fi
+
+    bsub $MAIL -W 119:59 -R "rusage[mem=${MEMORY}]" "./run.sh ${DATA_SET} ${KERNEL} 1000"
   done
 done
 
