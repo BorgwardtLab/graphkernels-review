@@ -19,4 +19,10 @@ OUTPUT=../matrices/$1
 # TODO: make configurable?
 BIN="$HOME/Projects/message_passing_graph_kernels/MPGK_AA.py"
 
-bsub -W 23:59 -R "rusage[mem=256000]" "python $BIN -a -l $ROOT -o $OUTPUT $NAME"
+OUT="$OUTPUT/MP.npz"
+
+if [ -f "$OUT" ]; then
+  echo "Output matrix $OUT already exists. Not creating a new job."
+else
+  bsub -W 23:59 -R "rusage[mem=256000]" "python $BIN -a -l $ROOT -o $OUTPUT $NAME"
+fi
