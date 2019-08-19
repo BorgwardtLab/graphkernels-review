@@ -12,13 +12,15 @@ fi
 for DATA_SET in "${DATA_SETS[@]}"; do
   for KERNEL in "${KERNELS[@]}"; do
 
-    # The SP kernel requires more memory...
+    # The SP kernel requires more memory and more time...
     MEMORY=64000
+    TIME=23:59
     if [ ${KERNEL} = "SP" ]; then
       MEMORY=128000
+      TIME=119:59
     fi
 
-    bsub $MAIL -W 23:59 -R "rusage[mem=${MEMORY}]" "./run.sh ${DATA_SET} ${KERNEL}"
+    bsub $MAIL -W ${TIME} -R "rusage[mem=${MEMORY}]" "./run.sh ${DATA_SET} ${KERNEL}"
   done
 done
 
