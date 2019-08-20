@@ -24,5 +24,5 @@ OUT="$OUTPUT/MP.npz"
 if [ -f "$OUT" ]; then
   echo "Output matrix $OUT already exists. Not creating a new job."
 else
-  bsub -W 23:59 -R "rusage[mem=256000]" "python $BIN -a -l $ROOT -o $OUTPUT $NAME"
+  bsub -W 119:59 -R "rusage[mem=256000]" "python $BIN -a -l $ROOT -o $OUTPUT $NAME"
 fi
