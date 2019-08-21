@@ -34,4 +34,4 @@ if __name__ == '__main__':
                 data.append((x, y))
 
         data = np.array(data)
-        np.savetxt(f'/tmp/{column}.txt', values, fmt='%2.2f')
+        np.savetxt(f'/tmp/{column}.txt', data, fmt='%2.2f')
