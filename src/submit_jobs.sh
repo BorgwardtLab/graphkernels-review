@@ -3,7 +3,7 @@
 # submit_jobs.sh: main controller for submitting jobs to Euler or
 # another cluster that is equipped with LFS.
 
-DATA_SETS=(AIDS BZR BZR_MD COX2 COX2_MD DD DHFR DHFR_MD ENZYMES ER_MD FIRSTMM_DB IMDB-BINARY IMDB-MULTI KKI Letter-high Letter-low Letter-med MSRC_21 MSRC_21C MSRC_9 MUTAG Mutagenicity OHSU PROTEINS PROTEINS_full PTC_FM PTC_FR PTC_MM PTC_MR Peking_1 REDDIT-BINARY SYNTHETIC SYNTHETICnew Synthie)
+DATA_SETS=(AIDS BZR BZR_MD COX2 COX2_MD DD DHFR DHFR_MD ENZYMES ER_MD FIRSTMM_DB IMDB-BINARY IMDB-MULTI KKI Letter-high Letter-low Letter-med MSRC_21 MSRC_21C MSRC_9 MUTAG OHSU PROTEINS PROTEINS_full PTC_FM PTC_FR PTC_MM PTC_MR Peking_1 REDDIT-BINARY SYNTHETIC SYNTHETICnew Synthie)
 
 if [ -z ${KERNELS+x} ]; then
   KERNELS=(EH GL MLG SP VH WL WLOA)
@@ -27,7 +27,7 @@ done
 # Handle large data sets by submitting them to an even longer queue
 # where they will hopefully be executed at some point.
 
-LARGE_DATA_SETS=(COIL-DEL COIL-RAG COLLAB DBLP_v1 FRANKENSTEIN NCI1 NCI109 REDDIT-MULTI-5K REDDIT-MULTI-12K)
+LARGE_DATA_SETS=(COIL-DEL COIL-RAG COLLAB DBLP_v1 FRANKENSTEIN Mutagenicity NCI1 NCI109 REDDIT-MULTI-5K REDDIT-MULTI-12K)
 
 for DATA_SET in "${LARGE_DATA_SETS[@]}"; do
   for KERNEL in "${KERNELS[@]}"; do
