@@ -29,6 +29,12 @@ done
 
 LARGE_DATA_SETS=(COIL-DEL COIL-RAG COLLAB DBLP_v1 FRANKENSTEIN Mutagenicity NCI1 NCI109 REDDIT-MULTI-5K REDDIT-MULTI-12K)
 
+# Check whether the number of iterations has been set from the outside.
+# If not, set it to a reasonable default value.
+if [ -z ${N_ITERS+x} ]; then
+  N_ITERS=1000
+fi
+
 for DATA_SET in "${LARGE_DATA_SETS[@]}"; do
   for KERNEL in "${KERNELS[@]}"; do
 
@@ -38,7 +44,7 @@ for DATA_SET in "${LARGE_DATA_SETS[@]}"; do
       MEMORY=128000
     fi
 
-    bsub $MAIL -W 119:59 -R "rusage[mem=${MEMORY}]" "./run.sh ${DATA_SET} ${KERNEL} 1000"
+    bsub $MAIL -W 119:59 -R "rusage[mem=${MEMORY}]" "./run.sh ${DATA_SET} ${KERNEL} ${N_ITERS}"
   done
 done
 
