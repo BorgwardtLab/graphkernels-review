@@ -15,6 +15,7 @@ import graphkernels.kernels as gk
 import igraph as ig
 import numpy as np
 
+from timeit import default_timer
 from tqdm import tqdm
 
 
@@ -65,6 +66,11 @@ if __name__ == '__main__':
         type=str,
         help='Output directory'
     )
+    parser.add_argument(
+        '-t', '--timing', action='store_true',
+        default=False,
+        help='If specified, only stores timing information'
+    )
 
     args = parser.parse_args()
 
@@ -112,6 +118,8 @@ if __name__ == '__main__':
 
     os.makedirs(args.output, exist_ok=True)
 
+    start_time = default_timer()
+
     for algorithm in sorted(tqdm(algorithms.keys(), desc='Algorithm')):
 
         # Filename for the current algorithm. We create this beforehand
@@ -119,7 +127,7 @@ if __name__ == '__main__':
         filename = os.path.join(args.output, f'{algorithm}.npz')
 
         if os.path.exists(filename):
-            if not args.force:
+            if not args.force and not args.timing:
                 logging.info('Output path already exists. Skipping.')
                 continue
 
@@ -147,9 +155,23 @@ its corresponding parameter grid.
             # the set of matrices.
             matrices['y'] = y
 
-            np.savez(filename, **matrices)
+            # We only save matrices if we are not in timing mode. In
+            # somse sense, the calculations will thus be lost but we
+            # should not account for the save time anyway.
+            if not args.timing:
+                np.savez(filename, **matrices)
 
         else:
             K = f(graphs)
 
+        # We only save the matrix if we are not in timing mode; see
+        # above for the rationale.
+        if not args.timing:
             np.savez(filename, K=K, y=y)
+
+    stop_time = default_timer()
+
+    # We overwrite this *all* the time because the information can
+    # always be replaced easily.
+    with open(os.path.join(args.output, 'Time.txt'), 'w') as f:
+        print(stop - art, file=f)
