@@ -114,4 +114,8 @@ if __name__ == '__main__':
             )
 
     df = pd.DataFrame.from_dict(data)
-    df.to_csv('Runtimes.csv', header=True, index=False)
+    df = df.sort_values(by=['avg_nodes'])
+    df.to_csv('Runtimes_nodes.csv', header=True, index=False)
+
+    df = df.sort_values(by=['avg_edges'])
+    df.to_csv('Runtimes_edges.csv', header=True, index=False)
