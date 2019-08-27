@@ -15,7 +15,7 @@ import graphkernels.kernels as gk
 import igraph as ig
 import numpy as np
 
-from timeit import default_timer
+from timeit import time
 from tqdm import tqdm
 
 
@@ -120,7 +120,7 @@ if __name__ == '__main__':
 
     for algorithm in sorted(tqdm(algorithms.keys(), desc='Algorithm')):
 
-        start_time = default_timer()
+        start_time = time.process_time()
 
         # Filename for the current algorithm. We create this beforehand
         # in order to check whether we would overwrite something.
@@ -164,7 +164,7 @@ its corresponding parameter grid.
         else:
             K = f(graphs)
 
-        stop_time = default_timer()
+        stop_time = time.process_time()
 
         # We overwrite this *all* the time because the information can
         # always be replaced easily.
@@ -175,6 +175,3 @@ its corresponding parameter grid.
         # above for the rationale.
         if not args.timing:
             np.savez(filename, K=K, y=y)
-
-
-
