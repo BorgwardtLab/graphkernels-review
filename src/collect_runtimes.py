@@ -10,10 +10,11 @@ import glob
 import random
 import os
 
-
 import igraph as ig
 import pandas as pd
 import numpy as np
+
+from tqdm import tqdm
 
 
 def calculate_graph_statistics(graphs):
@@ -105,7 +106,7 @@ if __name__ == '__main__':
     }
 
     for root, dirs, files in os.walk(args.ROOT, topdown=True):
-        for dirname in sorted(dirs):
+        for dirname in tqdm(sorted(dirs), desc='Data set'):
             data = process_directory(
                 os.path.join(root, dirname),
                 args.GRAPHS,
