@@ -118,9 +118,9 @@ if __name__ == '__main__':
 
     os.makedirs(args.output, exist_ok=True)
 
-    start_time = default_timer()
-
     for algorithm in sorted(tqdm(algorithms.keys(), desc='Algorithm')):
+
+        start_time = default_timer()
 
         # Filename for the current algorithm. We create this beforehand
         # in order to check whether we would overwrite something.
@@ -164,14 +164,17 @@ its corresponding parameter grid.
         else:
             K = f(graphs)
 
+        stop_time = default_timer()
+
+        # We overwrite this *all* the time because the information can
+        # always be replaced easily.
+        with open(os.path.join(args.output, f'Time_{algorithm}.txt'), 'w') as f:
+            print(stop_time - start_time, file=f)
+
         # We only save the matrix if we are not in timing mode; see
         # above for the rationale.
         if not args.timing:
             np.savez(filename, K=K, y=y)
 
-    stop_time = default_timer()
 
-    # We overwrite this *all* the time because the information can
-    # always be replaced easily.
-    with open(os.path.join(args.output, 'Time.txt'), 'w') as f:
-        print(stop - art, file=f)
+
