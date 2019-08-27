@@ -47,6 +47,12 @@ def process_directory(data_path, graph_path, data):
     name = os.path.basename(data_path)
 
     filenames = sorted(glob.glob(os.path.join(graph_path, name, '*.pickle')))
+
+    # Just ignore all the graphs for which no sampling could be
+    # performed anyway.
+    if len(filenames) < 100:
+        return data
+
     filenames = random.sample(filenames, 100)
     graphs = [ig.read(filename, format='picklez') for filename in filenames]
     avg_nodes, avg_edges = calculate_graph_statistics(graphs)
