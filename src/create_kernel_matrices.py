@@ -8,6 +8,7 @@
 import argparse
 import logging
 import os
+import random
 import sys
 import traceback
 
@@ -80,6 +81,13 @@ if __name__ == '__main__':
     )
 
     logging.info('Loading graphs...')
+
+    if args.timing:
+        logging.info('Choosing at most 100 graphs at random for timing')
+
+        random.seed(42)
+        args.FILE = random.sample(args.FILE, 100)
+
 
     graphs = [
         ig.read(filename, format='picklez') for filename in
