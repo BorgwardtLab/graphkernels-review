@@ -47,6 +47,7 @@ def process_directory(data_path, graph_path, data):
     name = os.path.basename(data_path)
 
     filenames = sorted(glob.glob(os.path.join(graph_path, name, '*.pickle')))
+    filenames = random.sample(filenames, 100)
     graphs = [ig.read(filename, format='picklez') for filename in filenames]
     avg_nodes, avg_edges = calculate_graph_statistics(graphs)
 
@@ -79,6 +80,11 @@ if __name__ == '__main__':
     parser.add_argument('GRAPHS', help='Root directory for graphs')
 
     args = parser.parse_args()
+
+    # TODO: this is a dependency to another script (i.e. the timing
+    # script for creating kernel matrices). I am too lazy to  solve
+    # it differently for now.
+    random.seed(42)
 
     # Stores data collected by the subsequent traversal routine. The
     # order of fields/values can change between calls of this script
