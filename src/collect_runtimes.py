@@ -12,6 +12,7 @@ import os
 
 
 import igraph as ig
+import pandas as pd
 import numpy as np
 
 
