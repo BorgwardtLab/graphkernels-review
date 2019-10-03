@@ -140,102 +140,43 @@ if __name__ == '__main__':
         # Check whether the data set has to be set up first; this
         # involves creating a list that can contain the sets of a
         # fold.
-        if name not in predictions_per_data_set:
+        if name not in predictions_per_data_set.keys():
 
             # This is somewhat inelegant, because we pretend that we are
             # looping when in reality, we are *not*.
-            for kernel, values in sorted(predictions.items()): 
-                predictions_per_data_set[name] = [set()] * len(values)
+            for kernel, values in sorted(predictions.items()):
+                predictions_per_data_set[name] = [
+                    set() for index in range(len(values))
+                ]
                 break
 
         # Check which labels coincide so that we can update the vector
         # of predictions accordingly.
         for kernel, values in sorted(predictions.items()):
             correct_labels = np.equal(values, labels)
-            correct_indices = np.where(correct_labels == True)[0]
+            correct_indices = np.where(correct_labels == True)
 
             # Insert kernel name into the set of kernels that are able
             # to perform proper predictions.
-            for index in correct_indices.ravel():
+            for index in correct_indices[0].ravel():
                 predictions_per_data_set[name][index].add(
                     kernel
                 )
 
-        continue
+    # Header for the output file; we do this manually because we are
+    # mavericks.
+    print('data_set,best_agreement,n_kernels')
 
-        # Insert values into the global data dictionary, while making
-        # sure that no re-ordering happens.
-        for kernel, values in sorted(predictions.items()):
-            all_predictions[kernel][name] = values
+    # Analyse the data sets now
+    for name in sorted(predictions_per_data_set.keys()):
 
-            # Data set has been seen; ensure that the size is correct
-            if name in data_set_to_size:
-                assert len(values) == data_set_to_size[name]
-            else:
-                data_set_to_size[name] = len(values)
+        counter = collections.Counter()
 
-            # Store kernel name so that we can unroll everything
-            kernel_names.add(kernel)
+        for kernels in predictions_per_data_set[name]:
+            frozen = frozenset(kernels)
+            counter[frozen] += 1
 
-        # Use this to indicate the original labels; we add it all the
-        # time for every data set because this is easier than doing a
-        # separate existence query.
-        all_predictions['XX'][name] = labels
-        kernel_names.add('XX')
+        k, v = counter.most_common(1)[0]
+        n = sum(counter.values())
 
-    # Unroll the prediction scores and create a new matrix that can be
-    # stored. First, we need to collect all data set, though; it *may*
-    # be possible that we have missing values for some data sets.
-
-    n_rows = len(kernel_names)
-    n_cols = sum([v for k, v in data_set_to_size.items()])
-
-    X = np.zeros((n_rows, n_cols))
-
-    # Will contain the row and column labels of the kernels that are
-    # used to generate the matrix of predictions.
-    names = []
-
-    # Kernels go into the rows, predictions go into the columns and are
-    # unrolled as *one* big list.
-    for row_index, kernel in enumerate(sorted(all_predictions.keys())):
-
-        names.append(kernel)
-
-        # Stores columns, indexed by data sets.
-        columns = {}
-
-        # Fill the column vector with NaNs. This ensures that everything
-        # can be calculated correctly even if no predictions are present
-        # for one of the kernels.
-        for data_set, size in sorted(data_set_to_size.items()):
-            x = np.empty((1, size))
-            x[:] = np.nan
-
-            columns[data_set] = x
-
-        for data_set, values in sorted(all_predictions[kernel].items()):
-
-            # Check that we are not doing something stupid with the
-            # predictions
-            assert len(values) == columns[data_set].shape[1]
-            columns[data_set][0, :] = values
-
-        x = np.concatenate([v for k, v in sorted(columns.items())],
-                axis=1)
-
-        X[row_index, :] = x
-
-    # That's the professional way ;)
-    X[np.isnan(X)] = -9999
-    X = X.astype(np.int)
-
-    df = pd.DataFrame(X, index=names)
-    df.to_csv('../results/Predictions.csv')
-
-    np.savetxt(
-        '../results/Predictions_raw.csv',
-        X,
-        delimiter=',',
-        fmt='%d'
-    )
+        print(f'{name},{v/n},{len(k)}')
