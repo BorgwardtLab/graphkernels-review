@@ -133,24 +133,33 @@ if __name__ == '__main__':
         assert data
 
         name = data['name']
+
         predictions = concatenate_predictions('y_pred', data)
         labels = concatenate_labels('y_test', data)
 
-        predictions_per_data_set[name].extend([set()] * len(labels))
+        # Check whether the data set has to be set up first; this
+        # involves creating a list that can contain the sets of a
+        # fold.
+        if name not in predictions_per_data_set:
 
-        # Calculate offset at which to *extend* the vector of
-        # predictions; this is required because there is *no*
-        # information about the number of folds a priori.
-        offset = len(predictions_per_data_set[name]) - len(labels)
+            # This is somewhat inelegant, because we pretend that we are
+            # looping when in reality, we are *not*.
+            for kernel, values in sorted(predictions.items()): 
+                predictions_per_data_set[name] = [set()] * len(values)
+                break
 
         # Check which labels coincide so that we can update the vector
         # of predictions accordingly.
         for kernel, values in sorted(predictions.items()):
             correct_labels = np.equal(values, labels)
-            correct_indices = np.where(correct_labels == True)
+            correct_indices = np.where(correct_labels == True)[0]
 
-            # Insert
-            for index in correct_indices:
+            # Insert kernel name into the set of kernels that are able
+            # to perform proper predictions.
+            for index in correct_indices.ravel():
+                predictions_per_data_set[name][index].add(
+                    kernel
+                )
 
         continue
 
