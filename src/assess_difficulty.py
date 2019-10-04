@@ -180,3 +180,30 @@ if __name__ == '__main__':
         n = sum(counter.values())
 
         print(f'{name},{v/n},{len(k)}')
+
+    print('')
+
+    # Header for the output file; we do this manually because we are
+    # mavericks.
+    print('data_set,total_accuracy,n_kernels')
+
+    # Analyse curves for each data set individually now. This only
+    # involves counting the number of kernels in terms of their
+    # cardinality.
+    for name in sorted(predictions_per_data_set.keys()):
+
+        counter = collections.defaultdict(lambda: 0)
+
+        for kernels in predictions_per_data_set[name]:
+            counter[len(kernels)] += 1
+
+        n = sum(counter.values())
+        total_accuracy = 0.0
+
+        for k in sorted(counter.keys(), reverse=True):
+            v = counter[k]
+            total_accuracy += v/n
+            
+            print(f'{name},{total_accuracy},{k}')
+
+        print('')
