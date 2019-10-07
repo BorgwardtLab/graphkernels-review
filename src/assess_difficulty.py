@@ -207,3 +207,22 @@ if __name__ == '__main__':
             print(f'{name},{total_accuracy},{k}')
 
         print('')
+
+    # Header for the output file; we do this manually because we just
+    # don't care.
+    print('data_set,unclassifiable')
+
+    # Check how many graphs fail to be classified by *all* of the
+    # kernels, i.e. there is *no* kernel capable of classifying a
+    # graph of that class correctly.
+    for name in sorted(predictions_per_data_set.keys()):
+
+        k = 0
+        n = 0
+
+        for kernels in predictions_per_data_set[name]:
+            n += 1
+            if len(kernels) == 0:
+                k += 1
+
+        print(f'{name},{k/n*100}')
