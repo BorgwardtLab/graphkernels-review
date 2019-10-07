@@ -25,5 +25,6 @@ if __name__ == '__main__':
               f'{best_accuracy:2.2f} '
               f'{worst_accuracy:2.2f} '
               f'{best_accuracy - worst_accuracy / best_accuracy:2.2f} '
+              f'{hist_accuracy} '
               f'{index}'
         )
