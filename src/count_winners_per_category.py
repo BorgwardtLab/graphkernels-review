@@ -60,8 +60,14 @@ if __name__ == '__main__':
     df = pd.read_csv(sys.argv[1], header=0, index_col=0)
     df = df.transpose()
 
+    kernels = [name for name in df.columns.values]
+
     winners_per_type = {
         c: Counter() for c in sorted(name_to_type.values())
+    }
+
+    accuracies_per_type = {
+        c: pd.DataFrame(columns=kernels) for c in sorted(name_to_type.values())
     }
 
     for index, row in df.iterrows():
@@ -74,6 +80,10 @@ if __name__ == '__main__':
             continue
 
         data_set_type = name_to_type[index]
+
+        accuracies_per_type[data_set_type] = \
+            accuracies_per_type[data_set_type].append(row)
+
         winners_per_type[data_set_type][winner] += 1
 
     n = 0
@@ -87,3 +97,17 @@ if __name__ == '__main__':
 
     # Check that we are not missing anything
     assert n == len(name_to_type)
+
+    # Rank based on mean accuracies
+    for c in sorted(set(name_to_type.values())):
+        df = accuracies_per_type[c]
+        df = df.mean(axis=0)
+        df = df.rank(axis=0, ascending=False, method='max')
+
+        print(f'Class {c}:')
+
+        print('1st place:', df[df == 1].index[0])
+        print('2nd place:', df[df == 2].index[0])
+        print('3rd place:', df[df == 3].index[0])
+
+        print('')
