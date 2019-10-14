@@ -10,9 +10,27 @@ import pandas as pd
 df = pd.read_csv('../results/Accuracies.csv', header=0, index_col=0)
 
 columns_to_keep = []
+bad_columns = [
+    # Solved data sets
+    'AIDS',
+    #'Letter-low',
+    #'Synthie',
+    #'SYNTHETICnew'
+    # Simple data sets
+    'BZR_MD',
+    'COX2_MD',
+    'KKI',
+    'PTC_MM',
+    ## Node-attributed data sets
+    #'Letter-med',
+    #'Letter-high',
+    ##
+    #'COIL-DEL',
+    #'FRANKENSTEIN',
+]
 
 for column in df.columns:
-    if 0.0 not in df[column].values:
+    if 1000 not in df[column].values and column not in bad_columns:
         columns_to_keep.append(column)
 
 df = df[columns_to_keep]
