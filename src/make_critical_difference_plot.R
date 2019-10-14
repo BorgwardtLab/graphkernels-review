@@ -22,4 +22,4 @@ rownames(data) <- gsub("WLOA", "WL-OA", rownames(data))
 library('scmamp')
 
 pdf('Critical_difference_plot.pdf')
-plotCD(t(data), alpha=0.01)
+plotCD(t(data), alpha=0.05)
