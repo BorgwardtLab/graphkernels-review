@@ -18,7 +18,7 @@ fix_row_names <- function(data) {
 }
 
 data <- read.table(
-  '../results/Accuracies.csv',
+  '../results/Accuracies_filtered.csv',
   sep=',',
   header=TRUE,
   row.names=1
