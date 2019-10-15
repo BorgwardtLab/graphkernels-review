@@ -33,6 +33,8 @@ if __name__ == '__main__':
 
     df = pd.read_csv(args.FILE, header=0, index_col=0)
 
+    print('data_set,n_overlaps,n_pairs')
+
     for column in df.columns:
         data_set, values = df[column].name, df[column].values
         algorithm = column
@@ -58,4 +60,4 @@ if __name__ == '__main__':
 
                 n_pairs += 1
 
-        print(f'{data_set}: {n_overlaps}/{n_pairs} overlaps')
+        print(f'{data_set},{n_overlaps},{n_pairs}')
