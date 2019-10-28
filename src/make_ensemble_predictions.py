@@ -221,4 +221,7 @@ if __name__ == '__main__':
             # the splitting process.
             accuracies.append(np.mean(accuracies_per_fold))
 
-        print(np.mean(accuracies) * 100, np.std(accuracies) * 100)
+        print(data_set,
+              f'{np.mean(accuracies) * 100:2.2f}',
+              '+-',
+              f'{np.std(accuracies) * 100:2.2f}')
