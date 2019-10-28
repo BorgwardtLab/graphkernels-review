@@ -178,7 +178,7 @@ if __name__ == '__main__':
             else:
                 for i, preds_per_iteration in enumerate(predictions):
                     for j, preds_per_fold in enumerate(preds_per_iteration):
-                        
+
                         # If the array is empty, initialise it with a
                         # counter based on the labels of each object.
                         if len(predictions_array[i][j]) == 0:
@@ -203,12 +203,22 @@ if __name__ == '__main__':
         # This involves comparing the original labels with the votes,
         # and calculating a new accuracy and standard deviation.
         for i in range(n_iterations):
+
+            accuracies_per_fold = []
+
             for j in range(n_folds):
                 result = [
                     x == y for x, y in zip(predictions_array[i][j], \
                         labels_per_fold[i][j])
                 ]
 
-                print(result)
+                n = len(result)
+                accuracy = sum(result) / n
 
-    assert false
+                accuracies_per_fold.append(accuracy)
+            
+            # This is the mean accuracy for the current repetition of
+            # the splitting process.
+            accuracies.append(np.mean(accuracies_per_fold))
+
+        print(np.mean(accuracies) * 100, np.std(accuracies) * 100)
