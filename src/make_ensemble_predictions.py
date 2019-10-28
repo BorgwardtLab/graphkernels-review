@@ -88,6 +88,9 @@ def concatenate_labels(label, data):
             data_per_fold = data_per_iteration['folds'][fold]
             labels = data_per_fold[label]
 
+            # Ensures that the data types are correct later on
+            labels = [str(label) for label in labels]
+
             results_per_fold.append(labels)
 
         results.append(results_per_fold)
@@ -194,6 +197,18 @@ if __name__ == '__main__':
                     label, _ = c.most_common(1)[0]
                     predictions_array[i][j][k] = label
 
-        print(predictions_array)
-        
+        accuracies = []
+
+        # Pretend to re-run the prediction analysis for the data set.
+        # This involves comparing the original labels with the votes,
+        # and calculating a new accuracy and standard deviation.
+        for i in range(n_iterations):
+            for j in range(n_folds):
+                result = [
+                    x == y for x, y in zip(predictions_array[i][j], \
+                        labels_per_fold[i][j])
+                ]
+
+                print(result)
+
     assert false
