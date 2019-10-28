@@ -216,7 +216,7 @@ if __name__ == '__main__':
                 accuracy = sum(result) / n
 
                 accuracies_per_fold.append(accuracy)
-            
+
             # This is the mean accuracy for the current repetition of
             # the splitting process.
             accuracies.append(np.mean(accuracies_per_fold))
