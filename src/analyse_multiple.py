@@ -120,6 +120,12 @@ def format_cell(x):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('FILE', nargs='+', help='Input file')
+    parser.add_argument(
+        '-m', '--measure',
+        default='accuracy',
+        type=str,
+        help='Performance measure to collate for the analysis'
+    )
 
     args = parser.parse_args()
 
@@ -136,7 +142,7 @@ if __name__ == '__main__':
         assert data
 
         name = data['name']
-        accuracies = collate_performance_measure('accuracy', data)
+        accuracies = collate_performance_measure(args.measure, data)
 
         df_local = pd.DataFrame.from_dict(accuracies, orient='index')
         df_local = df_local * 100
@@ -163,13 +169,13 @@ if __name__ == '__main__':
 
     # Stores original data frame containing the mean accuracy values as
     # well as the standard deviations.
-    df.to_csv('../results/Accuracies_with_sdev.csv')
+    df.to_csv(f'../results/{args.measure}.csv')
 
     # Store data frame containing nothing but the accuracies in order to
     # make it possible to *compare* graph kernels more meaningfully than
     # based on single tasks.
     df_vectorised = vectorise(df)
-    df_vectorised.to_csv('../results/Accuracies.csv')
+    df_vectorised.to_csv(f'../results/{args.measure}.csv')
 
     df = df.applymap(format_cell)
 
