@@ -25,6 +25,7 @@ from sklearn.metrics import make_scorer
 from sklearn.model_selection import ParameterGrid
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection._validation import _fit_and_score
+from sklearn.preprocessing import label_binarize
 from sklearn.svm import SVC
 
 # This is guaranteed to produce the *best* results in terms of time
@@ -155,7 +156,9 @@ def grid_search_cv(
     return clf, kernel_matrices[best_parameters['K']], best_parameters
 
 
-def train_and_test(train_indices, test_indices, matrices, max_iterations):
+def train_and_test(
+    train_indices, test_indices, matrices, n_classes, max_iterations
+):
     '''
     Trains the classifier on a set of kernel matrices (that are all
     assumed to come from the same algorithm). This uses pre-defined
@@ -164,6 +167,7 @@ def train_and_test(train_indices, test_indices, matrices, max_iterations):
     :param train_indices: Indices to be used for training
     :param test_indices: Indices to be used for testing
     :param matrices: Kernel matrices belonging to some algorithm
+    :param classes: Class labels
     :param max_iterations: Maximum number of iterations for SVM
 
     :return: Dictionary containing information about the training
@@ -200,15 +204,41 @@ def train_and_test(train_indices, test_indices, matrices, max_iterations):
     precision = precision_score(y_test, y_pred, average='macro')
     recall = recall_score(y_test, y_pred, average='macro')
 
+    n_classes = len(classes)
+
     # Score-based measures; in the multi-class setting, they are not
-    # available but we can simply ignore any errors.
-    try:
+    # available so we have to solve this manually.
+    if n_classes == 2:
         auroc = roc_auc_score(y_test, y_score[:, 1])
         auprc = average_precision_score(y_test, y_score[:, 1])
-    except ValueError:
-        auroc = np.nan
-        auprc = np.nan
+    else:
 
+        # This ensures that column $i$ can be used to access all labels
+        # of the same class.
+        y_test_binarized = label_binarize(
+            y_test,
+            classes=classes
+        )
+
+        aurocs = []
+        auprcs = []
+
+        for i in range(n_classes):
+            auroc = roc_auc_score(
+                y_test_binarized[:, i],
+                y_score[:, i],
+            )
+            auprc = average_precision_score(
+                y_test_binarized[:, i],
+                y_score[:, i]
+            )
+
+            aurocs.append(auroc)
+            auprcs.append(auprc)
+
+        auroc = np.mean(aurocs)
+        auprc = np.mean(auprcs)
+        
     results = {
         'best_model': best_parameters,
         'accuracy': accuracy,
@@ -320,6 +350,10 @@ has been specified.
             else:
                 assert n_graphs == M.shape[0]
 
+    # Determine classes; this will be required later on when calculating
+    # AUROC and AUPRC.
+    classes = list(sorted(set(y)))
+
     # Prepare cross-validated indices for the training data set.
     # Ideally, they should be loaded from *outside*.
     all_indices = np.arange(n_graphs)
@@ -369,6 +403,7 @@ has been specified.
                     train_indices,
                     test_indices,
                     matrix,
+                    classes,
                     args.max_iterations
                 )
 
