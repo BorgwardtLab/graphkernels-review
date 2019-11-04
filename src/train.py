@@ -182,7 +182,12 @@ def train_and_test(
     }
 
     clf, K, best_parameters = grid_search_cv(
-        SVC(kernel='precomputed', probability=True, max_iter=max_iterations),
+        SVC(
+            class_weight='balanced',
+            kernel='precomputed',
+            probability=True,
+            max_iter=max_iterations
+        ),
         train_indices,
         n_folds=5,
         param_grid=ParameterGrid(param_grid),
