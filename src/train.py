@@ -49,7 +49,7 @@ def normalize(matrix):
     # normalisation procedure. The remaining entries will be kept
     # at zero. This prevents 'NaN' values from cropping up.
     mask = np.diagonal(matrix) != 0
-    n = len(np.diagonal(matrix)) 
+    n = len(np.diagonal(matrix))
     k = np.zeros((n, ))
     k[mask] = 1.0 / np.sqrt(np.diagonal(matrix)[mask])
 
@@ -238,7 +238,7 @@ def train_and_test(
 
         auroc = np.mean(aurocs)
         auprc = np.mean(auprcs)
-        
+
     results = {
         'best_model': best_parameters,
         'accuracy': accuracy,
