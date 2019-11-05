@@ -4,7 +4,7 @@
 # Euler or another cluster that is equipped with LFS. This one only
 # submits jobs that contain mult-class data sets.
 
-DATA_SETS=(ENZYMES FIRSTMM_DB IMDB-MULTI Letter-high Letter-low Letter-med MSRC_21 MSRC_21C MSRC_9 Synthie)
+DATA_SETS=(ENZYMES IMDB-MULTI Letter-high Letter-low Letter-med MSRC_21 MSRC_21C MSRC_9 Synthie)
 
 if [ -z ${KERNELS+x} ]; then
   KERNELS=(EH GL MLG SP VH WL WLOA)
