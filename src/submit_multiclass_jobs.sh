@@ -7,7 +7,7 @@
 DATA_SETS=(ENZYMES IMDB-MULTI Letter-high Letter-low Letter-med MSRC_21 MSRC_21C MSRC_9 Synthie)
 
 if [ -z ${KERNELS+x} ]; then
-  KERNELS=(EH GL MLG SP VH WL WLOA)
+  KERNELS=(EH GL MLG MP SP VH WL WLOA)
 fi
 
 for DATA_SET in "${DATA_SETS[@]}"; do
