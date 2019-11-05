@@ -228,18 +228,28 @@ def train_and_test(
         aurocs = []
         auprcs = []
 
-        for i in range(n_classes):
-            auroc = roc_auc_score(
-                y_test_binarized[:, i],
-                y_score[:, i],
-            )
-            auprc = average_precision_score(
-                y_test_binarized[:, i],
-                y_score[:, i]
-            )
+        # In some cases, scores cannot be returned for each of the
+        # classes because the number of instances is insufficient.
+        n_scores = min(n_classes, y_score.shape[1])
 
-            aurocs.append(auroc)
-            auprcs.append(auprc)
+        for i in range(n_scores):
+            try:
+                auroc = roc_auc_score(
+                    y_test_binarized[:, i],
+                    y_score[:, i],
+                )
+                auprc = average_precision_score(
+                    y_test_binarized[:, i],
+                    y_score[:, i]
+                )
+
+                aurocs.append(auroc)
+                auprcs.append(auprc)
+
+            # Ignore errors in the calculation and do *not* include the
+            # results in the subsequent mean calculation.
+            except ValueError:
+                pass
 
         auroc = np.mean(aurocs)
         auprc = np.mean(auprcs)
