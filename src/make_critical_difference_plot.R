@@ -1,5 +1,5 @@
 data <- read.table(
-  '../results/Accuracies.csv',
+  '../results/auroc.csv',
   sep=',',
   header=TRUE,
   row.names=1

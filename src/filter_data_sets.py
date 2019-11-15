@@ -7,7 +7,7 @@
 
 import pandas as pd
 
-df = pd.read_csv('../results/Accuracies.csv', header=0, index_col=0)
+df = pd.read_csv('../results/auroc.csv', header=0, index_col=0)
 
 columns_to_keep = []
 bad_columns = [
