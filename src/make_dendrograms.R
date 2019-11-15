@@ -18,7 +18,7 @@ fix_row_names <- function(data) {
 }
 
 data <- read.table(
-  '../results/Accuracies_filtered.csv',
+  '../results/auroc_filtered.csv',
   sep=',',
   header=TRUE,
   row.names=1
@@ -30,7 +30,7 @@ distances.accuracy <- dist(data, method='euclidean')
 hc <- hclust(distances.accuracy)
 hcd <- as.dendrogram(hc)
 
-pdf('Dendrogram_accuracies.pdf')
+pdf('Dendrogram_AUROCs.pdf')
 
 plot(hcd)
 
