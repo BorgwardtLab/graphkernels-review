@@ -4,3 +4,6 @@ raw/
 
 *~
 *.swp
+
+# VS Code meta files
+.vscode
