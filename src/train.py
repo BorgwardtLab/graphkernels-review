@@ -153,7 +153,14 @@ def grid_search_cv(
                     # will also be returned later on.
                     best_parameters['K'] = K_param
 
-    return clf, kernel_matrices[best_parameters['K']], best_parameters
+    # Retrieve the kernel matrix of the best performing
+    # model and normalize if `best_parameters['normalize']` 
+    # is True
+    best_K = kernel_matrices[best_parameters['K']]
+    if best_parameters['normalize']:
+        best_K = normalize(best_K)
+
+    return clf, best_K, best_parameters
 
 
 def train_and_test(
