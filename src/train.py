@@ -88,19 +88,16 @@ def grid_search_cv(
 
     y = kernel_matrices['y'][train_indices]
 
-    cv = StratifiedKFold(
-        n_splits=n_folds,
-        shuffle=True,
-        random_state=42  # TODO: make configurable
-    )
-
     best_clf = None
     best_accuracy = 0.0
     best_parameters = {}
 
-    # From this point on, `train_index` and `test_index` are supposed to
-    # be understood *relative* to the input training indices.
-    for train_index, test_index in cv.split(train_indices, y):
+    # iterate over parameters in most outer loop to avoid issues
+    # with matrix normalization (when we loop over the matrices)
+    # in the next loop, then parameters['normalize'] can only
+    # be either True or False.
+    for parameters in list(param_grid):
+
         for K_param, K in kernel_matrices.items():
 
             # Skip labels; we could also remove them from the set of
@@ -112,21 +109,34 @@ def grid_search_cv(
 
             # This ensures that we *cannot* access the test indices,
             # even if we try :)
-            K = K[train_indices][:, train_indices]
+            K = K[train_indices, :][:, train_indices]
 
-            # Starts enumerating all 'inner' parameters, i.e. the ones
-            # that pertain to the classifier (and potentially how this
-            # matrix should be treated)
-            for parameters in list(param_grid):
-                if parameters['normalize']:
-                    K = normalize(K)
+            # normalize kernel matrix if parameters['normalize'] == True
+            if parameters['normalize']:
+                K = normalize(K)
 
-                # Remove the parameter because it does not pertain to
-                # the classifier below.
-                clf_parameters = {
-                    key: value for key, value in parameters.items()
-                    if key not in ['normalize']
-                }
+            # Remove the parameter because it does not pertain to
+            # the classifier below.
+            clf_parameters = {
+                key: value for key, value in parameters.items()
+                if key not in ['normalize']
+            }
+
+            # we have to create a new cv instance for each parameter
+            # tuple, because StratifiedKFold returns a generator
+            cv = StratifiedKFold(
+                n_splits=n_folds,
+                shuffle=True,
+                random_state=42  # TODO: make configurable
+            )
+
+            # initialize empty list to store fold accuracies of the
+            # current parameters in.
+            accuracy_list = []
+
+            # From this point on, `train_index` and `test_index` are supposed to
+            # be understood *relative* to the input training indices.
+            for train_index, test_index in cv.split(train_indices, y):
 
                 accuracy, params = _fit_and_score(
                     clone(clf),
@@ -139,19 +149,24 @@ def grid_search_cv(
                     fit_params=None,  # No additional parameters for `fit()`
                     return_parameters=True,
                 )
+                accuracy_list.append(accuracy)
 
-                # Note that when storing the parameters, we can re-use
-                # the original grid because we want to know about this
-                # normalization.
-                if accuracy > best_accuracy:
-                    best_clf = clone(clf).set_params(**params)
-                    best_accuracy = accuracy
-                    best_parameters = parameters
+            # compute accuracy mean of current parameters to compare to
+            # previously best result.
+            accuracy_mean = np.mean(accuracy_list)
 
-                    # Update kernel matrix parameter to indicate which
-                    # matrix was used to obtain these results. The key
-                    # will also be returned later on.
-                    best_parameters['K'] = K_param
+            # Note that when storing the best parameters, we can re-use
+            # the original grid because we want to know about this
+            # normalization.
+            if accuracy_mean > best_accuracy:
+                best_clf = clone(clf).set_params(**params)
+                best_accuracy = accuracy_mean
+                best_parameters = parameters
+
+                # Update kernel matrix parameter to indicate which
+                # matrix was used to obtain these results. The key
+                # will also be returned later on.
+                best_parameters['K'] = K_param
 
     # Retrieve the kernel matrix of the best performing
     # model and normalize if `best_parameters['normalize']` 
