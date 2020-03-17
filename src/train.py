@@ -160,7 +160,7 @@ def grid_search_cv(
     if best_parameters['normalize']:
         best_K = normalize(best_K)
 
-    return clf, best_K, best_parameters
+    return best_clf, best_K, best_parameters
 
 
 def train_and_test(
