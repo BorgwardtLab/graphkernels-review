@@ -161,7 +161,11 @@ def grid_search_cv(
             if accuracy_mean > best_accuracy:
                 best_clf = clone(clf).set_params(**params)
                 best_accuracy = accuracy_mean
-                best_parameters = parameters
+
+                # Make a copy of the dictionary to ensure that we are
+                # not updating it with parameters that cannot be used
+                # in the grid search (such as `K`).
+                best_parameters = dict(parameters)
 
                 # Update kernel matrix parameter to indicate which
                 # matrix was used to obtain these results. The key
