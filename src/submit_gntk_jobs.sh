@@ -3,7 +3,7 @@
 DATA_SETS=(MUTAG PROTEINS IMDB-BINARY IMDB-MULTI PTC_MR NCI1)
 
 if [ -z ${KERNELS+x} ]; then
-  KERNELS=(EH MLG MP SP VH WL WLOA)
+  KERNELS=(EH HGKSP_seed0 HGKWL_seed0 MLG MP SP VH WL WLOA)
 fi
 
 # Check whether the number of iterations has been set from the outside.
