@@ -9,7 +9,7 @@ fi
 # Check whether the number of iterations has been set from the outside.
 # If not, set it to a reasonable default value.
 if [ -z ${N_ITERS+x} ]; then
-  N_ITERS=1000
+  N_ITERS=500
 fi
 
 for DATA_SET in "${DATA_SETS[@]}"; do
