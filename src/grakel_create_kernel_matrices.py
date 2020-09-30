@@ -96,11 +96,11 @@ if __name__ == "__main__":
     y = [g['label'] for g in graphs]
     graphs = igraph_to_grakel(graphs)
     algorithms = {
-            "SP": grakel.kernels.ShortestPath(with_labels=True).fit_transform
+            "SP_gkl": grakel.kernels.ShortestPath(with_labels=True).fit_transform
             }
 
     param_grid = {
-            "SP": [1]
+            "SP_gkl": [1]
             }
 
     # Remove algorithms that have not been specified by the user; this
