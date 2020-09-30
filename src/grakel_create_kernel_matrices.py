@@ -88,9 +88,9 @@ if __name__ == "__main__":
             tqdm(sorted(os.listdir(args.FILE[0])), desc='File')
             ]
 
-    #graphs = [
-    #        preprocess(graph) for graph in tqdm(graphs, desc="Preprocessing")
-    #        ]
+    graphs = [
+            preprocess(graph) for graph in tqdm(graphs, desc="Preprocessing")
+            ]
     
 
     y = [g['label'] for g in graphs]
