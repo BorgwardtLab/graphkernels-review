@@ -18,3 +18,10 @@
 | VEH | 84.57 | 82.42 | 81.84 | 82.12 | 85.15 | 86.29 | 84.81 | 84.68 | 82.46 | 83.48 |  83.78 |  1.52 |
 | VH  | 86.07 | 84.54 | 86.12 | 85.73 | 85.70 | 85.82 | 85.15 | 86.37 | 86.18 | 86.59 |  85.83 |  0.60 |
 | WL  | 83.63 | 80.70 | 86.12 | 82.87 | 86.26 | 87.29 | 86.65 | 83.68 | 87.89 | 85.95 |  85.10 |  2.28 |
+
+## Using the repository
+
+Create symbolic links:
+
+- `data`: symbolic link to `/cluster/work/borgw/graphkernels-review/data`
+- `matrices`: symbolic link to `/cluster/work/borgw/graphkernels-review/matrices`
