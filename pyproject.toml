@@ -11,6 +11,8 @@ scikit-learn = "^0.22.2"
 tqdm = "^4.43.0"
 tabulate = "^0.8.6"
 pandas = "^1.0.2"
+grakel = "^0.1b7"
+python-igraph = "^0.8.2"
 
 [tool.poetry.dev-dependencies]
 
