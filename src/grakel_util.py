@@ -32,15 +32,13 @@ def get_edge_list(graph, directed=False):
 
 def get_node_label_dict(graph, attr_type="label"):
     """Returns a dict with node ids as keys and node attr as values """
+    d = {}   
     
     if len(graph.vs.attributes()) > 0:
         if len(attr_type) > 0:
             node_index = graph.vs.indices
             node_labels = [int(i) for i in graph.vs[attr_type]]
             d = dict(zip(node_index, node_labels))
-    
-    else:
-        d = {}
     
     return(d)
 
