@@ -14,6 +14,8 @@ import sys
 import traceback
 
 import grakel
+from grakel.kernels import ShortestPath, WeisfeilerLehman, VertexHistogram
+from grakel.kernels import EdgeHistogram, RandomWalkLabeled
 import igraph as ig
 import numpy as np
 
@@ -30,6 +32,22 @@ def preprocess(graph):
         graph.vs['label'] = graph.degree()
 
     return(graph)
+
+def gk_function(algorithm, graphs, par):
+    """ Functino to run the kernel on the param grid. Since different
+    kernels have different numbers of parameters, this is necessary. """
+    
+    if algorithm == "SP_gkl":
+        gk = ShortestPath(with_labels=True).fit_transform(graphs)
+    elif algorithm == "EH_gkl":
+        gk = EdgeHistogram().fit_transform(graphs)
+    elif algorithm == "WL_gkl":
+        gk = WeisfeilerLehman(n_iter=par).fit_transform(graphs)
+    elif algorithm == "RW_gkl":
+        lam, p = par
+        gk = RandomWalkLabeled(lamda=lam, p=p).fit_transform(graphs)
+    return(gk)
+
 
 
 if __name__ == "__main__":
@@ -83,6 +101,14 @@ if __name__ == "__main__":
         random.seed(42)
         args.FILE = random.sample(args.FILE, 100)
 
+    graph_attributes = {
+            "SP_gkl": {"vertex": "label", "edge": []},
+            "EH_gkl": {"vertex": [], "edge": "label"},
+            "RW_gkl": {"vertex": "label", "edge": []},
+            "WL_gkl": {"vertex": "label", "edge": []}
+            }
+
+
     graphs = [
             ig.read(filename, format='picklez') for filename in
             tqdm(args.FILE, desc='File')
@@ -91,23 +117,30 @@ if __name__ == "__main__":
     graphs = [
             preprocess(graph) for graph in tqdm(graphs, desc="Preprocessing")
             ]
-    
 
     y = [g['label'] for g in graphs]
-    graphs = igraph_to_grakel(graphs)
-    algorithms = {
-            "SP_gkl": grakel.kernels.ShortestPath(with_labels=True).fit_transform
-            }
+    graphs = igraph_to_grakel(graphs, attr=graph_attributes[args.algorithm[0]])
 
     param_grid = {
-            "SP_gkl": [1]
+            "SP_gkl": [1],
+            "WL_gkl": [1, 2, 3, 4, 5, 6, 7] # 0 returns an error
             }
+
+    algorithms = {
+            "SP_gkl": "Notused", # legacy item, I need a value 
+            "EH_gkl": "Notused", # legacy item, I need a value 
+            "WL_gkl": "Notused", # legacy item, I need a value 
+            "RW_gkl": "Notused", # legacy item, I need a value 
+            }
+
+    
 
     # Remove algorithms that have not been specified by the user; this
     # makes it possible to run only a subset of all configurations.
     algorithms = {
             k: v for k, v in algorithms.items() if k in args.algorithm
             }
+    
 
     os.makedirs(args.output, exist_ok=True)
 
@@ -127,13 +160,15 @@ if __name__ == "__main__":
 
         # Function to apply to the list of graphs in order to obtain
         # a kernel matrix.
-        f = algorithms[algorithm]
+        #f = algorithm[algorithm]
 
         if algorithm in param_grid.keys():
-            print("yes")
             try:
                 matrices = {
-                        str(param): f(graphs) # I removed par=param
+                        str(param): gk_function(
+                            algorithm=algorithm, 
+                            graphs=graphs, 
+                            par=param) 
                         for param in param_grid[algorithm]
                         }
             except NotImplementedError:
@@ -154,8 +189,14 @@ if __name__ == "__main__":
             if not args.timing:
                 np.savez(filename, **matrices)
 
+        # NEED TO CHECK WHY THIS IS SUDDENLY BREAKING
         else:
-            K = f(graphs)
+            K = gk_function(algorithm=f, graphs=graphs, par=None)
+            
+            # We only save the matrix if we are not in timing mode; see
+            # above for the rationale.
+            if not args.timing:
+                np.savez(filename, K=K, y=y)
 
         stop_time = time.process_time()
 
@@ -164,8 +205,4 @@ if __name__ == "__main__":
         with open(os.path.join(args.output, f'Time_{algorithm}.txt'), 'w') as f:
             print(stop_time - start_time, file=f)
 
-        # We only save the matrix if we are not in timing mode; see
-        # above for the rationale.
-        if not args.timing:
-            np.savez(filename, K=K, y=y)
-
+        
