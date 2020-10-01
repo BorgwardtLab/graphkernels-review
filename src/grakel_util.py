@@ -30,21 +30,28 @@ def get_edge_list(graph, directed=False):
     return(set(edges))
 
 
-def get_node_label_dict(graph):
+def get_node_label_dict(graph, attr_type="label"):
     """Returns a dict with node ids as keys and node attr as values """
-    node_index = graph.vs.indices
-    node_labels = [int(i) for i in graph.vs['label']]
     
-    d = dict(zip(node_index, node_labels))
+    if len(graph.vs.attributes()) > 0:
+        node_index = graph.vs.indices
+        node_labels = [int(i) for i in graph.vs[attr_type]]
+        d = dict(zip(node_index, node_labels))
+    
+    else:
+        d = {}
+    
     return(d)
 
 
-def get_edge_label_dict(graph):
-    """ Return a dict with edge tuple as key and edge label as value"""
+def get_edge_label_dict(graph, attr_type="label"):
+    """ Return a dict with edge tuple as key and edge attr/label as value"""
     d = {}
-    for e in graph.es:
-        d[(e.source, e.target)] = int(e['label'])
-        d[(e.target, e.source)] = int(e['label'])
+
+    if len(graph.es.attributes()) > 0:
+        for e in graph.es:
+            d[(e.source, e.target)] = int(e[attr_type])
+            d[(e.target, e.source)] = int(e[attr_type])
 
     return(d)
 
@@ -71,7 +78,7 @@ def igraph_to_grakel(graphs):
 
 if __name__ == "__main__":
     # Loads the MUTAG dataset
-    path = "/Users/lobray/Desktop/data/MUTAG/"
+    path = "/Users/lobray/Desktop/data/data/BZR/"
     FILE = sorted(os.listdir(path))
 
     graphs = [
@@ -85,8 +92,8 @@ if __name__ == "__main__":
     G = igraph_to_grakel(graphs)
     y = [int(g['label']) for g in graphs]
 
-    MUTAG = fetch_dataset("MUTAG", verbose=False)
-    G, y = MUTAG.data, MUTAG.target
+    #MUTAG = fetch_dataset("MUTAG", verbose=False)
+    #G, y = MUTAG.data, MUTAG.target
 
     # Splits the dataset into a training and a test set
     G_train, G_test, y_train, y_test = train_test_split(G, y,
