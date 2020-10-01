@@ -147,7 +147,6 @@ if __name__ == "__main__":
     for algorithm in sorted(tqdm(algorithms.keys(), desc='Algorithm')):
         
         start_time = time.process_time()
-        print(algorithm)
 
         # Filename for the current algorithm. We create this beforehand
         # in order to check whether we would overwrite something.
@@ -191,7 +190,7 @@ if __name__ == "__main__":
 
         # NEED TO CHECK WHY THIS IS SUDDENLY BREAKING
         else:
-            K = gk_function(algorithm=f, graphs=graphs, par=None)
+            K = gk_function(algorithm=algorithm, graphs=graphs, par=None)
             
             # We only save the matrix if we are not in timing mode; see
             # above for the rationale.
