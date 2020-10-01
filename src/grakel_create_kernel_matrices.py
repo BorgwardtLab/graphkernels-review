@@ -84,8 +84,8 @@ if __name__ == "__main__":
         args.FILE = random.sample(args.FILE, 100)
 
     graphs = [
-            ig.read(args.FILE[0] + filename, format='picklez') for filename in
-            tqdm(sorted(os.listdir(args.FILE[0])), desc='File')
+            ig.read(filename, format='picklez') for filename in
+            tqdm(args.FILE, desc='File')
             ]
 
     graphs = [
