@@ -144,7 +144,7 @@ if __name__ == '__main__':
         f = algorithms[algorithm]
 
         if algorithm in param_grid.keys():
-
+            print("still going!")
             try:
                 matrices = {
                     str(param): f(graphs, par=param)
@@ -172,6 +172,11 @@ its corresponding parameter grid.
         else:
             K = f(graphs)
 
+            # We only save the matrix if we are not in timing mode; see
+            # above for the rationale.
+            if not args.timing:
+                np.savez(filename, K=K, y=y)
+        
         stop_time = time.process_time()
 
         # We overwrite this *all* the time because the information can
@@ -179,7 +184,3 @@ its corresponding parameter grid.
         with open(os.path.join(args.output, f'Time_{algorithm}.txt'), 'w') as f:
             print(stop_time - start_time, file=f)
 
-        # We only save the matrix if we are not in timing mode; see
-        # above for the rationale.
-        if not args.timing:
-            np.savez(filename, K=K, y=y)
