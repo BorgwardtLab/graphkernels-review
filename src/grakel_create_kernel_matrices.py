@@ -119,7 +119,8 @@ if __name__ == "__main__":
             "SP_gkl": {"vertex": "label", "edge": []},
             "EH_gkl": {"vertex": [], "edge": "label"},
             "RW_gkl": {"vertex": "label", "edge": []},
-            "WL_gkl": {"vertex": "label", "edge": []}
+            "WL_gkl": {"vertex": "label", "edge": []},
+            "RW_gkl": {"vertex": "label", "edge": []}
             }
 
 
