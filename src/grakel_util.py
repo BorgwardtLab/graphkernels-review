@@ -17,6 +17,26 @@ from grakel.datasets import fetch_dataset
 from grakel.kernels import ShortestPath, WeisfeilerLehman, VertexHistogram
 import grakel
 
+
+def set_of_edge_labels(graphs):
+    """ Get set of unique edge labels (made from concatenated node
+    labels) and st"""
+    label = 0
+    all_edge_labels = {}
+
+    for graph in graphs:
+        for e in graph.es:
+            a = graph.vs['label'][e.source]
+            b = graph.vs['label'][e.target] 
+            k = str(min(a,b)) + "." + str(max(a,b))
+
+            if k not in all_edge_labels:
+                all_edge_labels[k] = label
+                label += 1
+
+    return(all_edge_labels)
+
+
 def get_edge_list(graph, directed=False):
     """Returns the tuple edge dict of graph, where each edge is
     represented as (a,b) and (b,a) when the graph is undirected """

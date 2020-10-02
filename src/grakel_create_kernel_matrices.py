@@ -33,8 +33,22 @@ def preprocess(graph):
 
     return(graph)
 
+
+def relabel_edges(graph, edge_labels):
+    ''' Relabels edges using the concatenated node labels hashed to an
+    integer'''
+    for e in graph.es:
+            
+        a = graph.vs['label'][e.source]
+        b = graph.vs['label'][e.target] 
+        k = str(min(a,b)) + "." + str(max(a,b))
+        e['label'] = edge_labels[k]
+
+    return(graph)
+
+
 def gk_function(algorithm, graphs, par):
-    """ Functino to run the kernel on the param grid. Since different
+    """ Function to run the kernel on the param grid. Since different
     kernels have different numbers of parameters, this is necessary. """
     
     if algorithm == "SP_gkl":
@@ -117,13 +131,22 @@ if __name__ == "__main__":
     graphs = [
             preprocess(graph) for graph in tqdm(graphs, desc="Preprocessing")
             ]
+    
+    # check if the graph has edge labels, and if not, relabel edges
+    if 'label' not in graphs[0].es.attributes():
+        edge_labels = set_of_edge_labels(graphs)
+        graphs = [relabel_edges(graph, edge_labels) for graph in graphs]
 
+    # convert to grakel format
     y = [g['label'] for g in graphs]
     graphs = igraph_to_grakel(graphs, attr=graph_attributes[args.algorithm[0]])
-
+    
     param_grid = {
             "SP_gkl": [1],
-            "WL_gkl": [1, 2, 3, 4, 5, 6, 7] # 0 returns an error
+            "WL_gkl": [1, 2, 3, 4, 5, 6, 7], # 0 returns an error
+            "RW_gkl":  [(l,p) for l in 
+                [10e-6, 10e-5, 10e-4, 10e-3, 10e-2] 
+                for p in [2, 3, 4, 5, 6, 7, None]]
             }
 
     algorithms = {
@@ -132,8 +155,6 @@ if __name__ == "__main__":
             "WL_gkl": "Notused", # legacy item, I need a value 
             "RW_gkl": "Notused", # legacy item, I need a value 
             }
-
-    
 
     # Remove algorithms that have not been specified by the user; this
     # makes it possible to run only a subset of all configurations.
@@ -188,7 +209,6 @@ if __name__ == "__main__":
             if not args.timing:
                 np.savez(filename, **matrices)
 
-        # NEED TO CHECK WHY THIS IS SUDDENLY BREAKING
         else:
             K = gk_function(algorithm=algorithm, graphs=graphs, par=None)
             
