@@ -15,7 +15,7 @@ import traceback
 
 import grakel
 from grakel.kernels import ShortestPath, WeisfeilerLehman, VertexHistogram
-from grakel.kernels import EdgeHistogram, RandomWalkLabeled
+from grakel.kernels import EdgeHistogram, RandomWalkLabeled, SubgraphMatching
 import igraph as ig
 import numpy as np
 
@@ -60,6 +60,8 @@ def gk_function(algorithm, graphs, par):
     elif algorithm == "RW_gkl":
         lam, p = par
         gk = RandomWalkLabeled(lamda=lam, p=p).fit_transform(graphs)
+    elif algorithm == "CSM_gkl":
+        gk = SubgraphMatching(k=par).fit_transform(graphs) 
     return(gk)
 
 
@@ -120,7 +122,8 @@ if __name__ == "__main__":
             "EH_gkl": {"vertex": [], "edge": "label"},
             "RW_gkl": {"vertex": "label", "edge": []},
             "WL_gkl": {"vertex": "label", "edge": []},
-            "RW_gkl": {"vertex": "label", "edge": []}
+            "RW_gkl": {"vertex": "label", "edge": []},
+            "CSM_gkl": {"vertex": "label", "edge": "label"}
             }
 
 
@@ -146,8 +149,9 @@ if __name__ == "__main__":
             "SP_gkl": [1],
             "WL_gkl": [1, 2, 3, 4, 5, 6, 7], # 0 returns an error
             "RW_gkl":  [(l,p) for l in 
-                [10e-6, 10e-5, 10e-4, 10e-3, 10e-2] 
-                for p in [2, 3, 4, 5, 6, 7, None]]
+                [10e-6, 10e-5, 10e-4] 
+                for p in [2, 3, 4, 5, 6, 7, None]],
+            "CSM_gkl": [3]
             }
 
     algorithms = {
@@ -155,6 +159,7 @@ if __name__ == "__main__":
             "EH_gkl": "Notused", # legacy item, I need a value 
             "WL_gkl": "Notused", # legacy item, I need a value 
             "RW_gkl": "Notused", # legacy item, I need a value 
+            "CSM_gkl": "Notused", # legacy item, I need a value 
             }
 
     # Remove algorithms that have not been specified by the user; this
