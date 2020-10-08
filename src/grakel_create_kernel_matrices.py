@@ -44,6 +44,9 @@ def relabel_edges(graph, edge_labels):
         k = str(min(a,b)) + "." + str(max(a,b))
         e['label'] = edge_labels[k]
 
+        # uniform label
+        #e['label'] = 1
+
     return(graph)
 
 
@@ -61,7 +64,13 @@ def gk_function(algorithm, graphs, par):
         lam, p = par
         gk = RandomWalkLabeled(lamda=lam, p=p).fit_transform(graphs)
     elif algorithm == "CSM_gkl":
-        gk = SubgraphMatching(k=par).fit_transform(graphs) 
+        c, k = par
+        # testing lambda function. c should reset for each iteration
+        gk = SubgraphMatching(
+                k=k, 
+                ke=lambda p1, p2: ke_kernel(p1, p2, c), # inline lambda 
+                kv=kv_kernel
+                ).fit_transform(graphs) 
     return(gk)
 
 
@@ -123,7 +132,7 @@ if __name__ == "__main__":
             "RW_gkl": {"vertex": "label", "edge": []},
             "WL_gkl": {"vertex": "label", "edge": []},
             "RW_gkl": {"vertex": "label", "edge": []},
-            "CSM_gkl": {"vertex": "label", "edge": "label"}
+            "CSM_gkl": {"vertex": "both", "edge": "both"}
             }
 
 
@@ -132,6 +141,9 @@ if __name__ == "__main__":
             tqdm(args.FILE, desc='File')
             ]
 
+    # sample graphs when testing code changes for expediency 
+    #graphs = [graphs[i] for i in list(np.arange(1, 150, 10))]
+    
     graphs = [
             preprocess(graph) for graph in tqdm(graphs, desc="Preprocessing")
             ]
@@ -151,7 +163,9 @@ if __name__ == "__main__":
             "RW_gkl":  [(l,p) for l in 
                 [10e-6, 10e-5, 10e-4] 
                 for p in [2, 3, 4, 5, 6, 7, None]],
-            "CSM_gkl": [3]
+            "CSM_gkl": [(c,k) for c in 
+                [0.1, 0.25, 0.5, 1.0] 
+                for k in [1, 2, 3, 4, 5, 6, 7]],
             }
 
     algorithms = {
