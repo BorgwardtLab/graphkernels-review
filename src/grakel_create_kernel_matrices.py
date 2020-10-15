@@ -161,11 +161,11 @@ if __name__ == "__main__":
             "SP_gkl": [1],
             "WL_gkl": [1, 2, 3, 4, 5, 6, 7], # 0 returns an error
             "RW_gkl":  [(l,p) for l in 
-                [10e-6, 10e-5, 10e-4] 
+                [0.001] 
                 for p in [2, 3, 4, 5, 6, 7, None]],
             "CSM_gkl": [(c,k) for c in 
-                [0.1, 0.25, 0.5, 1.0] 
-                for k in [1, 2, 3, 4, 5, 6, 7]],
+                [0.1, 0.5, 1.0] 
+                for k in [3, 4, 5]],
             }
 
     algorithms = {
@@ -227,7 +227,9 @@ if __name__ == "__main__":
             # somse sense, the calculations will thus be lost but we
             # should not account for the save time anyway.
             if not args.timing:
-                np.savez(filename, **matrices)
+                if not os.path.exists(filename):
+                    if not args.force:
+                        np.savez(filename, **matrices)
 
         else:
             K = gk_function(algorithm=algorithm, graphs=graphs, par=None)
@@ -235,7 +237,9 @@ if __name__ == "__main__":
             # We only save the matrix if we are not in timing mode; see
             # above for the rationale.
             if not args.timing:
-                np.savez(filename, K=K, y=y)
+                if not os.path.exists(filename):
+                    if not args.force:
+                        np.savez(filename, K=K, y=y)
 
         stop_time = time.process_time()
 
