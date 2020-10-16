@@ -45,7 +45,7 @@ def relabel_edges(graph, edge_labels):
         e['label'] = edge_labels[k]
 
         # uniform label
-        #e['label'] = 1
+        e['label'] = 1
 
     return(graph)
 
@@ -53,7 +53,7 @@ def relabel_edges(graph, edge_labels):
 def gk_function(algorithm, graphs, par):
     """ Function to run the kernel on the param grid. Since different
     kernels have different numbers of parameters, this is necessary. """
-    
+    print("parameters", par)
     if algorithm == "SP_gkl":
         gk = ShortestPath(with_labels=True).fit_transform(graphs)
     elif algorithm == "EH_gkl":
@@ -152,11 +152,10 @@ if __name__ == "__main__":
     if 'label' not in graphs[0].es.attributes():
         edge_labels = set_of_edge_labels(graphs)
         graphs = [relabel_edges(graph, edge_labels) for graph in graphs]
-
-    # convert to grakel format
-    y = [g['label'] for g in graphs]
-    graphs = igraph_to_grakel(graphs, attr=graph_attributes[args.algorithm[0]])
     
+    # convert to grakel format
+    graphs, y = igraph_to_grakel(graphs, attr=graph_attributes[args.algorithm[0]])
+
     param_grid = {
             "SP_gkl": [1],
             "WL_gkl": [1, 2, 3, 4, 5, 6, 7], # 0 returns an error
@@ -211,6 +210,7 @@ if __name__ == "__main__":
                             par=param) 
                         for param in param_grid[algorithm]
                         }
+                print([matrices[a].shape for a in matrices])
             except NotImplementedError:
                 logging.warning(f'''Caught exception for {algorithm};
                 continuing wiht the next algorithm and its corresponding
@@ -227,19 +227,19 @@ if __name__ == "__main__":
             # somse sense, the calculations will thus be lost but we
             # should not account for the save time anyway.
             if not args.timing:
-                if not os.path.exists(filename):
-                    if not args.force:
-                        np.savez(filename, **matrices)
+                #if not os.path.exists(filename):
+                #    if not args.force:
+                np.savez(filename, **matrices)
 
         else:
             K = gk_function(algorithm=algorithm, graphs=graphs, par=None)
-            
+            print(K.shape) 
             # We only save the matrix if we are not in timing mode; see
             # above for the rationale.
             if not args.timing:
-                if not os.path.exists(filename):
-                    if not args.force:
-                        np.savez(filename, K=K, y=y)
+                #if not os.path.exists(filename):
+                #    if not args.force:
+                np.savez(filename, K=K, y=y)
 
         stop_time = time.process_time()
 

@@ -39,7 +39,6 @@ def brownian_bridge(v1, v2, c=3):
 def kv_kernel(v1, v2, c=3):
     """ Updated vertex kernel that multiples the dirac on the node
     labels and a brownian bridge on the node attributes """
-    
     if isinstance(v1, int):
         """ If just an integer, then no attr """
         k_dirac = dirac(v1, v2)
@@ -53,18 +52,15 @@ def kv_kernel(v1, v2, c=3):
         else:
             k_dirac = dirac(v1[0], v2[0])
             k_brownian_bridge = brownian_bridge(v1[1:], v2[1:], c=c)
-            print(k_brownian_bridge)
 
     else:
         print("There is some problem with the data format")
-    
     return(k_dirac * k_brownian_bridge)
 
 
 def ke_kernel(e1, e2, c=0.25):
     """ Updated edge kernel that multiplies the dirac on the edge label
     and the triangulal kernel on the edge weights / attributes"""
-    
     if isinstance(e1, int):
         """ If edge is already an int, then no attr """
         k_dirac = dirac(e1, e2)
@@ -186,19 +182,29 @@ def create_grakel_graph(graph, attr):
     edges = get_edge_list(graph)
     edge_labels = get_edge_label_dict(graph, attr_type=edge_attr)
     node_labels = get_node_label_dict(graph, attr_type=node_attr)
-
-    G = grakel.Graph(
-            edges, 
-            node_labels=node_labels,
-            edge_labels=edge_labels
-            )
+    #G = grakel.Graph(
+    #        edges, 
+    #        node_labels=node_labels,
+    #        edge_labels=edge_labels,
+    #        graph_format="dictionary"
+    #        )
+    #print(G._format)
+    G = [edges, node_labels, edge_labels]
     return(G)
 
 
 def igraph_to_grakel(graphs, attr):
     """ Creates the grakel graph for all igraphs in the dataset"""
-    grakel_graphs = [create_grakel_graph(g, attr) for g in graphs]
-    return(grakel_graphs)
+    grakel_graphs = []
+    y = []
+    
+    for graph in graphs:
+        g = create_grakel_graph(graph, attr)
+        # if graph is fully disconnected, don't add
+        if len(g[0]) > 0:
+            grakel_graphs.append(g)
+            y.append(graph['label'])
+    return(grakel_graphs, y)
 
 
 if __name__ == "__main__":
