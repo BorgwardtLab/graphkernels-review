@@ -20,10 +20,10 @@
 #   of iterations for the SVM.
 
 
-python3 ../src/grakel_create_kernel_matrices.py -a $2 -o ../matrices/$1 ../data/$1/*.pickle
+poetry run python3 ../src/grakel_create_kernel_matrices.py -a $2 -o ../matrices/$1 ../data/$1/*.pickle
 
 if [ -n "$3" ]; then
-  python3 ../src/train.py ../matrices/$1/$2.npz -n $1 -o ../results/$1_$2.json -I $3
+  poetry run python3 ../src/train.py ../matrices/$1/$2.npz -n $1 -o ../results/$1_$2.json -I $3
 else
-  python3 ../src/train.py ../matrices/$1/$2.npz -n $1 -o ../results/$1_$2.json
+  poetry run python3 ../src/train.py ../matrices/$1/$2.npz -n $1 -o ../results/$1_$2.json
 fi
