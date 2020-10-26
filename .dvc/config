@@ -1,4 +1,0 @@
-[core]
-    remote = origin
-['remote "origin"']
-    url = ssh://bs-borgwardt02:/links/groups/borgwardt/Data/graphkernels-review-results
