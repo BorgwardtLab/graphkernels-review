@@ -13,7 +13,6 @@ tabulate = "^0.8.6"
 pandas = "^1.0.2"
 grakel = "^0.1b7"
 python-igraph = "^0.8.3"
-dvc = {extras = ["ssh"], version = "^1.9.0"}
 
 [tool.poetry.dev-dependencies]
 

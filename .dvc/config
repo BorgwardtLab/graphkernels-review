@@ -1,3 +1,0 @@
-[cache]
-    dir = /cluster/work/borgw/graphkernels-review-results-dvc-cache
-    shared = group
