@@ -4,6 +4,7 @@
 # deviations of all graph kernels from a large CSV file, and stores
 # them in single files (one per data set).
 
+import os
 import argparse
 
 import numpy as np
@@ -34,4 +35,11 @@ if __name__ == '__main__':
                 data.append((x, y))
 
         data = np.array(data)
-        np.savetxt(f'/tmp/{column}.txt', data, fmt='%2.2f')
+        print(column)
+        
+        # check that ouptut director exists, if not create it
+        if not os.path.exists('../output/sdev/'):
+            os.makedirs('../output/sdev/')
+
+
+        np.savetxt(f'../output/sdev/{column}.txt', data, fmt='%2.2f')

@@ -178,11 +178,36 @@ if __name__ == '__main__':
     df_vectorised.to_csv(f'../results/{args.measure}.csv')
 
     df = df.applymap(format_cell)
+    
+
+    # print EH and VH
+    hvev = df.transpose()[['VH', 'EH_gkl']]
+    print(
+            tabulate.tabulate(
+                hvev,
+                tablefmt='plain',
+                headers='keys'
+                )
+            )
+    
+    # print remaining kernels
+    full_results = df.transpose()[[
+        "CSM_gkl", "GH", "GL", "HGKSP_seed0", "HGKWL_seed0", "MLG", "MP",
+        "SP_gkl", "RW_gkl", "WL", "WLOA"
+        ]]
 
     print(
       tabulate.tabulate(
-        df.transpose(),
+        full_results,
         tablefmt='plain',
         headers='keys',
       )
     )
+
+    #print(
+    #  tabulate.tabulate(
+    #    df.transpose(),
+    #    tablefmt='plain',
+    #    headers='keys',
+    #  )
+    #)

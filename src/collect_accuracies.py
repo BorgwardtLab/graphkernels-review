@@ -3,6 +3,7 @@
 # collect_accuracies.py: collects accuracies of all graph kernels from
 # a large CSV file and stores them in single files (one per data set).
 
+import os
 import argparse
 
 import numpy as np
@@ -21,4 +22,8 @@ if __name__ == '__main__':
         values = df[column].values
         values = np.array(values[values > 0])
 
-        np.savetxt(f'/tmp/{column}.txt', values, fmt='%2.2f')
+        # check that ouptut director exists, if not create it
+        if not os.path.exists('../output/Boxplots/'):
+            os.makedirs('../output/Boxplots/')
+
+        np.savetxt(f'../output/Boxplots/{column}.txt', values, fmt='%2.2f')

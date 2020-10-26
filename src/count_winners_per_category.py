@@ -13,6 +13,7 @@ from collections import Counter
 # Please refer to the survey paper for more information about this
 # description/categorisation.
 name_to_type = {
+    'AIDS'              : 'iii',
     'BZR'               : 'v',
     'BZR_MD'            : 'vi',
     'COIL-DEL'          : 'iv',
@@ -88,6 +89,7 @@ if __name__ == '__main__':
 
     n = 0
 
+    print("Rank based on outperforming everyone else")
     for c in sorted(set(name_to_type.values())):
         print(f'Class {c}:')
         winners = winners_per_type[c]
@@ -99,6 +101,7 @@ if __name__ == '__main__':
     assert n == len(name_to_type)
 
     # Rank based on mean accuracies
+    print("Rank based on mean accuracies")
     for c in sorted(set(name_to_type.values())):
         df = accuracies_per_type[c]
         df = df.mean(axis=0)

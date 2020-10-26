@@ -374,7 +374,7 @@ has been specified.
         for parameter in matrix:
 
             M = matrix[parameter]
-
+            print("m", M.shape)
             if parameter != 'y':
                 # A kernel matrix needs to be square
                 assert M.shape[0] == M.shape[1]
@@ -386,6 +386,8 @@ has been specified.
 
             # Either set the number of graphs, or check that each matrix
             # contains the same number of them.
+            print(n_graphs)
+            print(M.shape)
             if n_graphs is None:
                 n_graphs = M.shape[0]
             else:

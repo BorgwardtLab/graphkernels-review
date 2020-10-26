@@ -10,6 +10,9 @@ import sys
 
 
 if __name__ == '__main__':
+    measure = sys.argv[1].split("/")[2]
+    measure = measure.split(".csv")[0]
+
     df = pd.read_csv(sys.argv[1], header=0, index_col=0)
     df = df.transpose()
 
@@ -28,3 +31,12 @@ if __name__ == '__main__':
               f'{hist_accuracy} '
               f'{index}'
         )
+
+        with open(f'../output/Vertex_histogram_kernel_{measure}_differences.txt', 'a') as f:
+             print(f'{delta:2.2f} '
+              f'{mean_accuracy:2.2f} '
+              f'{best_accuracy:2.2f} '
+              f'{worst_accuracy:2.2f} '
+              f'{best_accuracy - worst_accuracy / best_accuracy:2.2f} '
+              f'{hist_accuracy} '
+              f'{index}', file=f)

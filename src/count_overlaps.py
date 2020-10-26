@@ -35,6 +35,9 @@ if __name__ == '__main__':
 
     print('data_set,n_overlaps,n_pairs')
 
+    with open(f'../output/Overlap.csv', 'a') as f:
+        print(f'data_set,n_overlaps,n_pairs', file=f)
+    
     for column in df.columns:
         data_set, values = df[column].name, df[column].values
         algorithm = column
@@ -59,5 +62,9 @@ if __name__ == '__main__':
                     n_overlaps += 1
 
                 n_pairs += 1
+        
 
         print(f'{data_set},{n_overlaps},{n_pairs}')
+
+        with open(f'../output/Overlap.csv', 'a') as f:
+            print(f'{data_set},{n_overlaps},{n_pairs}', file=f)

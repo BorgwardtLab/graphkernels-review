@@ -6,12 +6,14 @@
 import pandas as pd
 
 import sys
+import os
 
 from collections import Counter
 
 # Please refer to the survey paper for more information about this
 # description/categorisation.
 name_to_type = {
+    'AIDS'              : 'iii',  
     'BZR'               : 'v',
     'BZR_MD'            : 'vi',
     'COIL-DEL'          : 'iv',
@@ -88,10 +90,14 @@ if __name__ == '__main__':
         print('-' * 72, '\n')
         print('name,data_set,accuracy')
         
+        # check that ouptut director exists, if not create it
+        if not os.path.exists('../output/accuracies_per_class/'):
+            os.makedirs('../output/accuracies_per_class/')
+
         for index, row in df.iterrows():
             name = index
 
-            with open(f'/tmp/{c}_{name}.csv', 'w') as f:
+            with open(f'../output/accuracies_per_class/{c}_{name}.csv', 'w') as f:
                 print('data_set,accuracy', file=f)
                 for i, value in enumerate(row.values):
                     data_set = row.index[i]
