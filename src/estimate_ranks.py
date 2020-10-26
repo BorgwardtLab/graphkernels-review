@@ -50,6 +50,6 @@ if __name__ == '__main__':
     df = pd.DataFrame(columns=['mean', 'std'])
     df['mean'] = mean
     df['std'] = std
-
+    
     pd.options.display.float_format = '{:,.2f}'.format
-    print(df)
+    print(df.sort_values(by=['mean']))

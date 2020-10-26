@@ -1,7 +1,10 @@
 #!/bin/bash
 
 """ Script to run all the numbers for the Experiemnts chapter of the
-graph kernels survey. """
+graph kernels survey. The data used is stored on
+/cluster/work/borgw/graphkernels-review-results/ (the raw json), but
+analyse_multiple will save the accuracy.csv and such files in
+../results/ """
 
 # TODO: make all of these save to an output folder that can be copied
 # into the data folder of the latex file
