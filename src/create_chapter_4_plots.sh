@@ -68,7 +68,8 @@ echo "============================================================="
 # performing kernel). This is saved as a txt file
 # (output/Vertex_histogram_kernel_{measure}_differences.txt) and put 
 # here: Data/Vertex_histogram_kernel_accuracy_differences.txt and 
-#  Data/Vertex_histogram_kernel_auroc_differences.txt
+#  Data/Vertex_histogram_kernel_auroc_differences.txt. Had to manually
+#  enter class category at the end of these txt.
 echo "============================================================="
 echo "Figure 4.5"
 echo "accuracy"
@@ -134,8 +135,8 @@ echo "============================================================="
 # is saved as Data/Difficulty_unclassifiable.csv
 echo "============================================================="
 echo "Figure 4.12 and Figure 4.13"
-poetry run python collect_predictions.py /cluster/work/borgw/graphkernels-review-results/*.json
-poetry run python assess_difficulty.py  ../results/Predictions.csv
+poetry run python collect_predictions.py 
+poetry run python assess_difficulty.py  /cluster/work/borgw/graphkernels-review-results/*.json
 echo "============================================================="
 # TODO: Confirm this is working as planned. 
 

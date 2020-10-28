@@ -125,43 +125,65 @@ if __name__ == '__main__':
     # We collate *all* of the files instead of using single one. This
     # gives us more flexibility. In theory, this should also work for
     # files in which multiple measurements are present.
+    
+    files_to_ignore = [
+            "/cluster/work/borgw/graphkernels-review-results/COIL-RAG_EH_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/COIL-RAG_SP_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/COIL-RAG_RW_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/COIL-RAG_CSM_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-low_EH_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-low_SP_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-low_RW_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-low_CSM_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-med_EH_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-med_SP_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-med_RW_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-med_CSM_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-high_EH_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-high_SP_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-high_RW_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-high_CSM_gkl.json",
+            ]
+    
     for filename in tqdm(args.FILE, desc='File'):
+        if filename in files_to_ignore:
+            continue
+        else:
+            with open(filename) as f:
+                data = json.load(f)
 
-        with open(filename) as f:
-            data = json.load(f)
+            assert data
 
-        assert data
+            name = data['name']
 
-        name = data['name']
+            predictions = concatenate_predictions('y_pred', data)
+            labels = concatenate_labels('y_test', data)
 
-        predictions = concatenate_predictions('y_pred', data)
-        labels = concatenate_labels('y_test', data)
+            # Check whether the data set has to be set up first; this
+            # involves creating a list that can contain the sets of a
+            # fold.
+            if name not in predictions_per_data_set.keys():
 
-        # Check whether the data set has to be set up first; this
-        # involves creating a list that can contain the sets of a
-        # fold.
-        if name not in predictions_per_data_set.keys():
+                # This is somewhat inelegant, because we pretend that we are
+                # looping when in reality, we are *not*.
+                for kernel, values in sorted(predictions.items()):
+                    predictions_per_data_set[name] = [
+                        set() for index in range(len(values))
+                    ]
+                    break
 
-            # This is somewhat inelegant, because we pretend that we are
-            # looping when in reality, we are *not*.
+            # Check which labels coincide so that we can update the vector
+            # of predictions accordingly.
             for kernel, values in sorted(predictions.items()):
-                predictions_per_data_set[name] = [
-                    set() for index in range(len(values))
-                ]
-                break
+                correct_labels = np.equal(values, labels)
+                correct_indices = np.where(correct_labels == True)
 
-        # Check which labels coincide so that we can update the vector
-        # of predictions accordingly.
-        for kernel, values in sorted(predictions.items()):
-            correct_labels = np.equal(values, labels)
-            correct_indices = np.where(correct_labels == True)
-
-            # Insert kernel name into the set of kernels that are able
-            # to perform proper predictions.
-            for index in correct_indices[0].ravel():
-                predictions_per_data_set[name][index].add(
-                    kernel
-                )
+                # Insert kernel name into the set of kernels that are able
+                # to perform proper predictions.
+                for index in correct_indices[0].ravel():
+                    predictions_per_data_set[name][index].add(
+                        kernel
+                    )
 
     # Header for the output file; we do this manually because we are
     # mavericks.
