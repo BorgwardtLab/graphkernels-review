@@ -40,4 +40,5 @@ if __name__ == '__main__':
 
 
         data.to_csv(f'../output/accuracies/{column}_accuracies.csv',
-                header=False)#, data, fmt='%2.2f')
+                header=False,
+                sep=" ")#, data, fmt='%2.2f')
