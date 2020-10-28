@@ -171,6 +171,7 @@ if __name__ == '__main__':
         'SYNTHETICnew'      : '1',
         'Synthie'           : '4'
     }
+    print(name_to_type['AIDS'])
 
 
 

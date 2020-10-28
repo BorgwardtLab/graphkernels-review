@@ -60,7 +60,7 @@ if __name__ == '__main__':
     # Convert the matrix into a proper data frame to obtain a nice
     # output of the calculated distances.
     df = pd.DataFrame(D, index=kernel_names, columns=kernel_names)
-    df.to_csv('/tmp/Distances_Hamming.csv')
+    df.to_csv('/../output/Distances_Hamming.csv')
 
     for name, coordinate in zip(kernel_names, Y):
         x = coordinate[0]

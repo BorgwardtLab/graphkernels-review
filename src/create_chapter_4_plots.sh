@@ -87,7 +87,7 @@ echo "============================================================="
 # the s.d. on all benchmarkd datasets.)
 echo "============================================================="
 echo "Figure 4.6 and 4.7"
-echo "I'm not sure if this is correct."
+echo "Uses output of Step 8."
 #poetry run python compare_baselines.py ../results/accuracy_with_sdev.csv
 echo "============================================================="
 # TODO: check this.
@@ -96,8 +96,7 @@ echo "============================================================="
 # Data/accuracies/GH_accuracies.csv ????
 echo "============================================================="
 echo "Figure 4.8"
-echo "I can't find this script. Need to write it"
-#poetry run python collect_accuracies.py ../results/accuracy.csv
+poetry run python collect_accuracies_with_sdev_by_kernel.py ../results/accuracy_with_sdev.csv
 echo "============================================================="
 # TODO: perhaps write this script? Can't find it
 
@@ -135,7 +134,7 @@ echo "============================================================="
 # is saved as Data/Difficulty_unclassifiable.csv
 echo "============================================================="
 echo "Figure 4.12 and Figure 4.13"
-poetry run python collect_predictions.py 
+poetry run python collect_predictions.py /cluster/work/borgw/graphkernels-review-results/*.json
 poetry run python assess_difficulty.py  /cluster/work/borgw/graphkernels-review-results/*.json
 echo "============================================================="
 # TODO: Confirm this is working as planned. 
@@ -160,8 +159,6 @@ echo "============================================================="
 echo "Figure 4.15"
 poetry run python embed_kernel_predictions.py ../results/Predictions.csv
 echo "============================================================="
-# TODO: What is the input file?? It is a dataframe, so maybe
-# Predictions.csv?
 
 # Step 20: Update Figure 4.16 (Dendrogram). Uses the output of
 # embed_kernel_predictions.py (i.e. Distances_Hamming.csv). The two pdfs
