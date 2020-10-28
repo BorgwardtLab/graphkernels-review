@@ -121,36 +121,55 @@ if __name__ == '__main__':
     # We collate *all* of the files instead of using single one. This
     # gives us more flexibility. In theory, this should also work for
     # files in which multiple measurements are present.
+    files_to_ignore = [
+            "/cluster/work/borgw/graphkernels-review-results/COIL-RAG_EH_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/COIL-RAG_SP_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/COIL-RAG_RW_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/COIL-RAG_CSM_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-low_EH_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-low_SP_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-low_RW_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-low_CSM_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-med_EH_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-med_SP_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-med_RW_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-med_CSM_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-high_EH_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-high_SP_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-high_RW_gkl.json",
+            "/cluster/work/borgw/graphkernels-review-results/Letter-high_CSM_gkl.json",
+            ]
     for filename in tqdm(args.FILE, desc='File'):
+        if filename in files_to_ignore:
+            continue
+        else:
+            with open(filename) as f:
+                data = json.load(f)
 
-        with open(filename) as f:
-            data = json.load(f)
+            assert data
 
-        assert data
+            name = data['name']
+            predictions = concatenate_predictions('y_pred', data)
+            labels = concatenate_labels('y_test', data)
 
-        name = data['name']
-        predictions = concatenate_predictions('y_pred', data)
-        labels = concatenate_labels('y_test', data)
+            # Insert values into the global data dictionary, while making
+            # sure that no re-ordering happens.
+            for kernel, values in sorted(predictions.items()):
+                all_predictions[kernel][name] = values
+                # Data set has been seen; ensure that the size is correct
+                if name in data_set_to_size:
+                    assert len(values) == data_set_to_size[name]
+                else:
+                    data_set_to_size[name] = len(values)
 
-        # Insert values into the global data dictionary, while making
-        # sure that no re-ordering happens.
-        for kernel, values in sorted(predictions.items()):
-            all_predictions[kernel][name] = values
+                # Store kernel name so that we can unroll everything
+                kernel_names.add(kernel)
 
-            # Data set has been seen; ensure that the size is correct
-            if name in data_set_to_size:
-                assert len(values) == data_set_to_size[name]
-            else:
-                data_set_to_size[name] = len(values)
-
-            # Store kernel name so that we can unroll everything
-            kernel_names.add(kernel)
-
-        # Use this to indicate the original labels; we add it all the
-        # time for every data set because this is easier than doing a
-        # separate existence query.
-        all_predictions['XX'][name] = labels
-        kernel_names.add('XX')
+            # Use this to indicate the original labels; we add it all the
+            # time for every data set because this is easier than doing a
+            # separate existence query.
+            all_predictions['XX'][name] = labels
+            kernel_names.add('XX')
 
     # Unroll the prediction scores and create a new matrix that can be
     # stored. First, we need to collect all data set, though; it *may*
@@ -168,7 +187,6 @@ if __name__ == '__main__':
     # Kernels go into the rows, predictions go into the columns and are
     # unrolled as *one* big list.
     for row_index, kernel in enumerate(sorted(all_predictions.keys())):
-
         names.append(kernel)
 
         # Stores columns, indexed by data sets.
