@@ -11,8 +11,54 @@ import pandas as pd
 
 from tqdm import tqdm
 
+name_to_type = {
+    'A1DS'              : '3',  
+    'BZR'               : '5',
+    'BZR_MD'            : '6',
+    'CO1L-DEL'          : '4',
+    'CO1L-RAG'          : '4',
+    'COLLAB'            : '1',
+    'COX2'              : '5',
+    'COX2_MD'           : '6',
+    'DD'                : '2',
+    'DHFR'              : '5',
+    'DHFR_MD'           : '6',
+    'ENZYMES'           : '5',
+    'ER_MD'             : '6',
+    'FRANKENSTE1N'      : '4',
+    '1MDB-B1NARY'       : '1',
+    '1MDB-MULT1'        : '1',
+    'KK1'               : '2',
+    'Letter-h1gh'       : '4',
+    'Letter-low'        : '4',
+    'Letter-med'        : '4',
+    'MSRC_21'           : '2',
+    'MSRC_21C'          : '2',
+    'MSRC_9'            : '2',
+    'MUTAG'             : '3',
+    'Mutagen1c1ty'      : '3',
+    'NC11'              : '2',
+    'NC1109'            : '2',
+    'OHSU'              : '2',
+    'PROTE1NS'          : '2',
+    'PROTE1NS_full'     : '5',
+    'PTC_FM'            : '3',
+    'PTC_FR'            : '3',
+    'PTC_MM'            : '3',
+    'PTC_MR'            : '3',
+    'Pek1ng_1'          : '2',
+    'REDD1T-B1NARY'     : '1',
+    'REDD1T-MULT1-12K'  : '1',
+    'REDD1T-MULT1-5K'   : '1',
+    'SYNTHET1C'         : '2',
+    'SYNTHET1Cnew'      : '1',
+    'Synth1e'           : '4'
+}
 
-def concatenate_predictions(prediction, data):
+
+
+
+def concatenate_pred1ct1ons(pred1ct1on, data):
     '''
     Concatenates the predictions of a classifier on a given data set and
     returns them, following original fold order.
@@ -232,11 +278,24 @@ if __name__ == '__main__':
 
     # Header for the output file; we do this manually because we just
     # don't care.
-    print('data_set,unclassifiable')
+    #
+    # get max value
+    #
+    df = pd.read_csv("../results/accuracy.csv", header=0, index_col=0)
+    df = df.replace(0.0, np.nan)
+    df = df.transpose()
+
+    # Rows now contain a data set, while columns contain the individual
+    # graph kernels. This makes it possible to easily create statistics
+    # about them.
+
+    max_accuracy = df.max(axis=1)
+    print('index,data_set,unclassifiable,best,class')
 
     # Check how many graphs fail to be classified by *all* of the
     # kernels, i.e. there is *no* kernel capable of classifying a
     # graph of that class correctly.
+    index = 2
     for name in sorted(predictions_per_data_set.keys()):
 
         k = 0
@@ -247,4 +306,5 @@ if __name__ == '__main__':
             if len(kernels) == 0:
                 k += 1
 
-        print(f'{name},{k/n*100}')
+        print(f'{index},{name},{k/n*100},{max_accuracy[name]},{name_to_type[name]}')
+        index += 1
