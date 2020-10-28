@@ -14,7 +14,7 @@ from tqdm import tqdm
 
 
 
-def concatenate_predictions(predict1on, data):
+def concatenate_predictions(prediction, data):
     '''
     Concatenates the predictions of a classifier on a given data set and
     returns them, following original fold order.
