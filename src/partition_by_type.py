@@ -91,13 +91,13 @@ if __name__ == '__main__':
         print('name,data_set,accuracy')
         
         # check that ouptut director exists, if not create it
-        if not os.path.exists('../output/accuracies_per_class/'):
-            os.makedirs('../output/accuracies_per_class/')
+        if not os.path.exists('../output/aurocs_per_class/'):
+            os.makedirs('../output/aurocs_per_class/')
 
         for index, row in df.iterrows():
             name = index
 
-            with open(f'../output/accuracies_per_class/{c}_{name}.csv', 'w') as f:
+            with open(f'../output/aurocs_per_class/{c}_{name}.csv', 'w') as f:
                 print('data_set,accuracy', file=f)
                 for i, value in enumerate(row.values):
                     data_set = row.index[i]

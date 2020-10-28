@@ -61,7 +61,7 @@ echo "============================================================="
 #   Data/accuracies_per_class
 echo "============================================================="
 echo "Figure 4.4"
-poetry run python partition_by_type.py ../results/accuracy.csv
+poetry run python partition_by_type.py ../results/auroc.csv
 echo "============================================================="
 
 # Step 8: Update Figure 4.5 (mean accuracy of histogram kernel to best
