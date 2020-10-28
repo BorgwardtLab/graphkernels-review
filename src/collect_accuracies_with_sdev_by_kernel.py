@@ -28,6 +28,8 @@ if __name__ == '__main__':
                 y = float(y.strip())
 
                 data.append((round(x,2), round(y,2)))
+            else:
+                data.append((0.00, 0.00))
 
         data = pd.DataFrame(data)
         print(column)
