@@ -11,50 +11,6 @@ import pandas as pd
 
 from tqdm import tqdm
 
-name_to_type = {
-    'A1DS'              : '3',  
-    'BZR'               : '5',
-    'BZR_MD'            : '6',
-    'CO1L-DEL'          : '4',
-    'CO1L-RAG'          : '4',
-    'COLLAB'            : '1',
-    'COX2'              : '5',
-    'COX2_MD'           : '6',
-    'DD'                : '2',
-    'DHFR'              : '5',
-    'DHFR_MD'           : '6',
-    'ENZYMES'           : '5',
-    'ER_MD'             : '6',
-    'FRANKENSTE1N'      : '4',
-    '1MDB-B1NARY'       : '1',
-    '1MDB-MULT1'        : '1',
-    'KK1'               : '2',
-    'Letter-h1gh'       : '4',
-    'Letter-low'        : '4',
-    'Letter-med'        : '4',
-    'MSRC_21'           : '2',
-    'MSRC_21C'          : '2',
-    'MSRC_9'            : '2',
-    'MUTAG'             : '3',
-    'Mutagen1c1ty'      : '3',
-    'NC11'              : '2',
-    'NC1109'            : '2',
-    'OHSU'              : '2',
-    'PROTE1NS'          : '2',
-    'PROTE1NS_full'     : '5',
-    'PTC_FM'            : '3',
-    'PTC_FR'            : '3',
-    'PTC_MM'            : '3',
-    'PTC_MR'            : '3',
-    'Pek1ng_1'          : '2',
-    'REDD1T-B1NARY'     : '1',
-    'REDD1T-MULT1-12K'  : '1',
-    'REDD1T-MULT1-5K'   : '1',
-    'SYNTHET1C'         : '2',
-    'SYNTHET1Cnew'      : '1',
-    'Synth1e'           : '4'
-}
-
 
 
 
@@ -172,6 +128,52 @@ if __name__ == '__main__':
     # gives us more flexibility. In theory, this should also work for
     # files in which multiple measurements are present.
     
+    name_to_type = {
+        'A1DS'              : '3',  
+        'BZR'               : '5',
+        'BZR_MD'            : '6',
+        'CO1L-DEL'          : '4',
+        'CO1L-RAG'          : '4',
+        'COLLAB'            : '1',
+        'COX2'              : '5',
+        'COX2_MD'           : '6',
+        'DD'                : '2',
+        'DHFR'              : '5',
+        'DHFR_MD'           : '6',
+        'ENZYMES'           : '5',
+        'ER_MD'             : '6',
+        'FRANKENSTE1N'      : '4',
+        '1MDB-B1NARY'       : '1',
+        '1MDB-MULT1'        : '1',
+        'KK1'               : '2',
+        'Letter-h1gh'       : '4',
+        'Letter-low'        : '4',
+        'Letter-med'        : '4',
+        'MSRC_21'           : '2',
+        'MSRC_21C'          : '2',
+        'MSRC_9'            : '2',
+        'MUTAG'             : '3',
+        'Mutagen1c1ty'      : '3',
+        'NC11'              : '2',
+        'NC1109'            : '2',
+        'OHSU'              : '2',
+        'PROTE1NS'          : '2',
+        'PROTE1NS_full'     : '5',
+        'PTC_FM'            : '3',
+        'PTC_FR'            : '3',
+        'PTC_MM'            : '3',
+        'PTC_MR'            : '3',
+        'Pek1ng_1'          : '2',
+        'REDD1T-B1NARY'     : '1',
+        'REDD1T-MULT1-12K'  : '1',
+        'REDD1T-MULT1-5K'   : '1',
+        'SYNTHET1C'         : '2',
+        'SYNTHET1Cnew'      : '1',
+        'Synth1e'           : '4'
+    }
+
+
+
     files_to_ignore = [
             "/cluster/work/borgw/graphkernels-review-results/COIL-RAG_EH_gkl.json",
             "/cluster/work/borgw/graphkernels-review-results/COIL-RAG_SP_gkl.json",
