@@ -37,4 +37,5 @@ if __name__ == '__main__':
             os.makedirs('../output/accuracies/')
 
 
-        data.to_csv(f'../output/accuracies/{column}_accuracies.csv')#, data, fmt='%2.2f')
+        data.to_csv(f'../output/accuracies/{column}_accuracies.csv',
+                header=False)#, data, fmt='%2.2f')
