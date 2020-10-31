@@ -30,6 +30,5 @@ rownames(data) <- gsub("CSM_gkl", "CSM", rownames(data))
 
 library('scmamp')
 
-pdf('Critical_difference_plot.pdf')
+pdf('Critical_difference_plot.pdf', width=7.5)
 plotCD(t(data), alpha=0.05)
-b
