@@ -1,3 +1,5 @@
+# https://www.hiqpdf.com/
+
       google.charts.load('current', {'packages':['sankey']});
       google.charts.setOnLoadCallback(drawChart);
 
@@ -21,9 +23,11 @@
           
           [ 'Shortest-path', 'Node labels', 1 ],
           [ 'Shortest-path', 'Node attributes', 1 ],
+          [ 'Shortest-path', 'Edge attributes', 1 ],
           
           [ 'GraphHopper', 'Node labels', 1 ],
           [ 'GraphHopper', 'Node attributes', 1 ],
+          [ 'GraphHopper', 'Edge attributes', 1 ],
 		
     			[ 'Subtree pattern', 'Node labels', 1 ],
           
@@ -196,9 +200,11 @@
           
           [ 'Shortest-path', 'Node labels', 1 ],
           [ 'Shortest-path', 'Node attributes', 1 ],
+          [ 'Shortest-path', 'Edge attributes', 1 ],
           
           [ 'GraphHopper', 'Node labels', 1 ],
           [ 'GraphHopper', 'Node attributes', 1 ],
+          [ 'GraphHopper', 'Edge attributes', 1 ],
 		
     			[ 'Subtree pattern', 'Node labels', 1 ],
           
@@ -277,8 +283,6 @@
           [ 'Core based kernel framework', 'Node attributes', 1 ],
           [ 'Core based kernel framework', 'Edge labels', 1 ],
           [ 'Core based kernel framework', 'Edge attributes', 1 ],
-
-
         ]);
 
         // Sets chart options.
