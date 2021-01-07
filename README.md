@@ -1,5 +1,22 @@
 # `graphkernels-review`: Code and data sets for the review on graph kernels
 
+
+This repository contains the scripts used to run the experiments seen in
+the following article:
+
+Karsten Borgwardt, Elisabetta Ghisu, Felipe Llinares-López, Leslie O'Bray and Bastian Rieck (2020).
+[Graph Kernels: State-of-the-Art and Future Challenges](http://dx.doi.org/10.1561/2200000076),
+Foundations and Trends® in Machine Learning: Vol. 13: No. 5-6, pp 531-712.
+
+
+## Using the repository
+
+As a general structure, we assume to have the data stored in a `data`
+folder and the generated kernel matrices saved in an output `matrices`
+folder. We used `poetry` to manage the dependencies, which can be
+installed by running `poetry install` in the terminal (assuming `poetry`
+is already installed). 
+
 ## Generating kernel matrices
 
     ./src/create_kernel_matrices.py -o ./matrices/MUTAG ./data/MUTAG/*.pickle
@@ -8,7 +25,13 @@
 
     ./src/train.py ./matrices/MUTAG/*.npz -n MUTAG -o ./results/MUTAG.json
 
-## Example output
+## Example illustration of what output looks like
+
+
+  The output is stored in a `json` file with results, and can be
+  aggregated into a single `csv` file using the script:
+
+    ./src/analyse_multiple.py ./results/*.json
 
 |     |     0 |     1 |     2 |     3 |     4 |     5 |     6 |     7 |     8 |     9 |   mean |   std |
 |-----|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|--------|-------|
@@ -19,9 +42,12 @@
 | VH  | 86.07 | 84.54 | 86.12 | 85.73 | 85.70 | 85.82 | 85.15 | 86.37 | 86.18 | 86.59 |  85.83 |  0.60 |
 | WL  | 83.63 | 80.70 | 86.12 | 82.87 | 86.26 | 87.29 | 86.65 | 83.68 | 87.89 | 85.95 |  85.10 |  2.28 |
 
-## Using the repository
+## The remaining files
 
-Create symbolic links:
+The remaining files were used to generate the specific plots in the
+review or to submit jobs on a computing cluster.
 
-- `data`: symbolic link to `/cluster/work/borgw/graphkernels-review/data`
-- `matrices`: symbolic link to `/cluster/work/borgw/graphkernels-review/matrices`
+## Contributors
+
+This effort was done by the following individuals: Elisabetta Ghisu, Felipe Llinares-López, Philipp Nikolaus, Leslie O’Bray, and Bastian Rieck.
+
