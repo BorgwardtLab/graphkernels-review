@@ -69,7 +69,7 @@ echo "============================================================="
 # (output/Vertex_histogram_kernel_{measure}_differences.txt) and put 
 # here: Data/Vertex_histogram_kernel_accuracy_differences.txt and 
 #  Data/Vertex_histogram_kernel_auroc_differences.txt. Had to manually
-#  enter class category at the end of these txt.
+#  enter class category at the end of these txt. 
 echo "============================================================="
 echo "Figure 4.5"
 echo "accuracy"
@@ -77,6 +77,8 @@ poetry run python compare_baselines.py ../results/accuracy.csv
 echo "auroc"
 poetry run python compare_baselines.py ../results/auroc.csv
 echo "============================================================="
+# TODO: need to append the class label at the end of the txt file
+# TODO: need to add \ before _ in the dataset names, e.g. BZR\_MD
 
 # Step 9: Update Figure 4.6 (performance of VH against the best kernel,
 # using accuracy) and Figure 4.7 (performance of VH against the best
@@ -93,12 +95,11 @@ echo "============================================================="
 # TODO: check this.
 
 # Step 11: Update Figure 4.8 (all accuracies). This data is stored in 
-# Data/accuracies/GH_accuracies.csv ????
+# Data/accuracies/GH_accuracies.csv 
 echo "============================================================="
 echo "Figure 4.8"
 poetry run python collect_accuracies_with_sdev_by_kernel.py ../results/accuracy_with_sdev.csv
 echo "============================================================="
-# TODO: perhaps write this script? Can't find it
 
 # Step 12: Update Figure 4.9 (accuracy across iterations, not
 # highlighting EH/VH), which is stored here: Data/sdev/Synthie.txt. This
@@ -159,6 +160,7 @@ echo "============================================================="
 echo "Figure 4.15"
 poetry run python embed_kernel_predictions.py ../results/Predictions.csv
 echo "============================================================="
+# TODO: add x y kernel as header, fix names of kernels for plotting.
 
 # Step 20: Update Figure 4.16 (Dendrogram). Uses the output of
 # embed_kernel_predictions.py (i.e. Distances_Hamming.csv). The two pdfs
